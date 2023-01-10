@@ -1,42 +1,36 @@
 package ru.touchthegrass.tpc.data.local
 
 import ru.touchthegrass.tpc.data.Lobby
+import ru.touchthegrass.tpc.data.PlayerGameSession
+import ru.touchthegrass.tpc.data.PlayerStatus
 
 object LocalLobbyProvider {
 
-    val allLobbies = listOf(
+    val allLobbies = LocalGameSessionProvider.allGameSessions
+        .map { gameSession ->
+            Lobby(
+                gameSession = gameSession,
+                playerInfos = LocalPlayerProvider.getRandomGroup()
+                    .map { player ->
+                        PlayerGameSession(
+                            player = player,
+                            gameSession = gameSession,
+                            isActive = true,
+                            status = PlayerStatus.NOT_READY
+                        )
+                    }
+                    .toMutableList()
+            )
+        }
+        .toMutableList()
 
-        Lobby(
-            id = 1,
-            players = LocalPlayersProvider.getRandomGroup(),
-            rules = LocalGameRulesProvider.getRandomRules()
-        ),
-        Lobby(
-            id = 2,
-            players = LocalPlayersProvider.getRandomGroup(),
-            rules = LocalGameRulesProvider.getRandomRules()
-        ),
-        Lobby(
-            id = 3,
-            players = LocalPlayersProvider.getRandomGroup(),
-            rules = LocalGameRulesProvider.getRandomRules()
-        ),
-        Lobby(
-            id = 4,
-            players = LocalPlayersProvider.getRandomGroup(),
-            rules = LocalGameRulesProvider.getRandomRules()
-        ),
-        Lobby(
-            id = 5,
-            players = LocalPlayersProvider.getRandomGroup(),
-            rules = LocalGameRulesProvider.getRandomRules()
-        ),
-        Lobby(
-            id = 6,
-            players = LocalPlayersProvider.getRandomGroup(),
-            rules = LocalGameRulesProvider.getRandomRules()
-        )
-    )
+    fun getLobbyByGameSessionId(gameSessionId: Int): Lobby {
+        return allLobbies.first { it.gameSession.id == gameSessionId }
+    }
 
-    fun getById(id: Long): Lobby? = allLobbies.firstOrNull { it.id == id }
+    fun createLobby(): Lobby {
+        val lobby = Lobby(gameSession = LocalGameSessionProvider.createGameSession())
+        allLobbies.add(lobby)
+        return lobby
+    }
 }

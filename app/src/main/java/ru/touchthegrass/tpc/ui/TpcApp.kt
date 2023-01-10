@@ -14,28 +14,117 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
+import ru.touchthegrass.tpc.data.PieceColor
+import ru.touchthegrass.tpc.ui.component.LobbyDrawerContent
 import ru.touchthegrass.tpc.ui.navigation.*
 import ru.touchthegrass.tpc.ui.screen.EmptyScreen
+import ru.touchthegrass.tpc.ui.screen.TpcLobbyScreen
 import ru.touchthegrass.tpc.ui.screen.TpcLobbiesScreen
 import ru.touchthegrass.tpc.ui.util.*
 import ru.touchthegrass.tpc.viewmodel.TpcFilterState
 import ru.touchthegrass.tpc.viewmodel.TpcHomeUIState
+import ru.touchthegrass.tpc.viewmodel.TpcLobbyState
+import ru.touchthegrass.tpc.viewmodel.TpcPlayerState
 
 @Composable
 fun TpcApp(
     tpcHomeUIState: TpcHomeUIState,
+    tpcPlayerState: TpcPlayerState,
     tpcFilterState: TpcFilterState,
+    tpcLobbyState: TpcLobbyState,
     closeFilterScreen: () -> Unit,
-    navigateToFilter: () -> Unit,
-    onPlayerFilterChanged: (String) -> Unit
+    navigateToFilterScreen: () -> Unit,
+    onPlayerFilterChanged: (String) -> Unit,
+    closeLobbyScreen: () -> Unit,
+    navigateOnLobbyScreen: (Int) -> Unit,
+    createLobby: () -> Unit,
+    onPieceColorChanged: (PieceColor) -> Unit,
+    onReadinessChanged: (Boolean) -> Unit
 ) {
-    TpcNavigationWrapper(
-        tpcHomeUIState = tpcHomeUIState,
-        tpcFilterState = tpcFilterState,
-        closeFilterScreen = closeFilterScreen,
-        navigateToFilter = navigateToFilter,
-        onPlayerFilterChanged = onPlayerFilterChanged
-    )
+    if (tpcHomeUIState.openedLobby) {
+        TpcLobbyWrapper(
+            tpcPlayerState = tpcPlayerState,
+            tpcLobbyState = tpcLobbyState,
+            closeLobbyScreen = closeLobbyScreen,
+            onPieceColorChanged = onPieceColorChanged,
+            onReadinessChanged = onReadinessChanged
+        )
+    } else {
+        TpcNavigationWrapper(
+            tpcHomeUIState = tpcHomeUIState,
+            tpcFilterState = tpcFilterState,
+            tpcLobbyState = tpcLobbyState,
+            closeFilterScreen = closeFilterScreen,
+            navigateToFilterScreen = navigateToFilterScreen,
+            onPlayerFilterChanged = onPlayerFilterChanged,
+            navigateOnLobbyScreen = navigateOnLobbyScreen,
+            createLobby = createLobby
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TpcLobbyWrapper(
+    tpcPlayerState: TpcPlayerState,
+    tpcLobbyState: TpcLobbyState,
+    closeLobbyScreen: () -> Unit,
+    onPieceColorChanged: (PieceColor) -> Unit,
+    onReadinessChanged: (Boolean) -> Unit
+) {
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            LobbyDrawerContent(
+                rules = tpcLobbyState.gameSession?.rules ?: error("Current lobby is nullable"),
+                closeDrawer = {
+                    scope.launch {
+                        drawerState.close()
+                    }
+                }
+            )
+        }
+    ) {
+        TpcLobbyContent(
+            tpcPlayerState = tpcPlayerState,
+            tpcLobbyState = tpcLobbyState,
+            closeLobbyScreen = closeLobbyScreen,
+            onPieceColorChanged = onPieceColorChanged,
+            onReadinessChanged = onReadinessChanged
+        ) {
+            scope.launch {
+                drawerState.open()
+            }
+        }
+    }
+}
+
+@Composable
+fun TpcLobbyContent(
+    tpcPlayerState: TpcPlayerState,
+    tpcLobbyState: TpcLobbyState,
+    closeLobbyScreen: () -> Unit,
+    onPieceColorChanged: (PieceColor) -> Unit,
+    onReadinessChanged: (Boolean) -> Unit,
+    onDrawerPressed: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.inverseOnSurface)
+    ) {
+        TpcLobbyScreen(
+            currentPlayer = tpcPlayerState.currentPlayer!!,
+            playerGameSessionInfos = tpcLobbyState.playerGameSessionInfos,
+            closeLobbyScreen = closeLobbyScreen,
+            onPieceColorChanged = onPieceColorChanged,
+            onReadinessChanged = onReadinessChanged,
+            onDrawerPressed = onDrawerPressed
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,9 +132,12 @@ fun TpcApp(
 fun TpcNavigationWrapper(
     tpcHomeUIState: TpcHomeUIState,
     tpcFilterState: TpcFilterState,
+    tpcLobbyState: TpcLobbyState,
     closeFilterScreen: () -> Unit,
-    navigateToFilter: () -> Unit,
-    onPlayerFilterChanged: (String) -> Unit
+    navigateToFilterScreen: () -> Unit,
+    onPlayerFilterChanged: (String) -> Unit,
+    navigateOnLobbyScreen: (Int) -> Unit,
+    createLobby: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -62,7 +154,8 @@ fun TpcNavigationWrapper(
             NavigationDrawerContent(
                 selectedDestination = selectedDestination,
                 navigateToTopLevelDestination = navigationActions::navigateTo,
-                onDrawerClicked = {
+                createLobby = createLobby,
+                closeDrawer = {
                     scope.launch {
                         drawerState.close()
                     }
@@ -74,27 +167,32 @@ fun TpcNavigationWrapper(
         TpcTabContent(
             tpcHomeUIState = tpcHomeUIState,
             tpcFilterState = tpcFilterState,
+            tpcLobbyState = tpcLobbyState,
             navController = navController,
             selectedDestination = selectedDestination,
             navigateToTopLevelDestination = navigationActions::navigateTo,
             closeFilterScreen = closeFilterScreen,
-            navigateToFilter = navigateToFilter,
-            onPlayerFilterChanged = onPlayerFilterChanged
+            navigateToFilter = navigateToFilterScreen,
+            onPlayerFilterChanged = onPlayerFilterChanged,
+            navigateOnLobbyScreen = navigateOnLobbyScreen,
+            createLobby = createLobby
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TpcTabContent(
     tpcHomeUIState: TpcHomeUIState,
     tpcFilterState: TpcFilterState,
+    tpcLobbyState: TpcLobbyState,
     navController: NavHostController,
     selectedDestination: String,
     navigateToTopLevelDestination: (TpcTopLevelDestination) -> Unit,
     closeFilterScreen: () -> Unit,
     navigateToFilter: () -> Unit,
-    onPlayerFilterChanged: (String) -> Unit
+    onPlayerFilterChanged: (String) -> Unit,
+    navigateOnLobbyScreen: (Int) -> Unit,
+    createLobby: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -109,9 +207,12 @@ fun TpcTabContent(
             navController = navController,
             tpcHomeUIState = tpcHomeUIState,
             tpcFilterState = tpcFilterState,
+            tpcLobbyState = tpcLobbyState,
             closeFilterScreen = closeFilterScreen,
             navigateToFilter = navigateToFilter,
-            onPlayerFilterChanged = onPlayerFilterChanged
+            onPlayerFilterChanged = onPlayerFilterChanged,
+            navigateOnLobbyScreen = navigateOnLobbyScreen,
+            createLobby = createLobby
         )
         if (navBarEnabled) {
             TpcBottomNavigationBar(
@@ -128,9 +229,12 @@ private fun TpcNavHost(
     navController: NavHostController,
     tpcHomeUIState: TpcHomeUIState,
     tpcFilterState: TpcFilterState,
+    tpcLobbyState: TpcLobbyState,
     closeFilterScreen: () -> Unit,
     navigateToFilter: () -> Unit,
-    onPlayerFilterChanged: (String) -> Unit
+    onPlayerFilterChanged: (String) -> Unit,
+    navigateOnLobbyScreen: (Int) -> Unit,
+    createLobby: () -> Unit
 ) {
     NavHost(
         modifier = modifier,
@@ -141,9 +245,12 @@ private fun TpcNavHost(
             TpcLobbiesScreen(
                 tpcHomeUIState = tpcHomeUIState,
                 tpcFilterState = tpcFilterState,
+                tpcLobbyState = tpcLobbyState,
                 closeFilterScreen = closeFilterScreen,
                 navigateToFilter = navigateToFilter,
                 onPlayerFilterChanged = onPlayerFilterChanged,
+                navigateOnLobbyScreen = navigateOnLobbyScreen,
+                createLobby = createLobby
             )
         }
         composable(TpcRoute.RATING) {

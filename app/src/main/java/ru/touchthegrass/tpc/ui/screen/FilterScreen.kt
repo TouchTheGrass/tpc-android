@@ -4,23 +4,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FirstPage
 import androidx.compose.material.icons.filled.Square
 import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.touchthegrass.tpc.R
+import ru.touchthegrass.tpc.ui.component.FooterButton
 import ru.touchthegrass.tpc.ui.component.TcpFilterSwitchItem
-import ru.touchthegrass.tpc.ui.component.TpcSearchPlayerBar
 
 @Preview
 @Composable
@@ -86,26 +82,9 @@ fun TpcFilterScreen(
                 )
             }
         }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            ExtendedFloatingActionButton(
-                onClick = closeFilterScreen,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 12.dp, horizontal = 16.dp),
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-            ) {
-                Text(
-                    modifier = Modifier,
-                    text = stringResource(id = R.string.apply_filters),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
+        FooterButton(
+            text = stringResource(id = R.string.apply_filters),
+            onClick = closeFilterScreen
+        )
     }
 }

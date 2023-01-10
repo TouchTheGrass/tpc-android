@@ -17,7 +17,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.touchthegrass.tpc.R
 import ru.touchthegrass.tpc.ui.util.LayoutType
-import ru.touchthegrass.tpc.ui.util.TpcNavigationContentPosition
 import ru.touchthegrass.tpc.ui.util.tpcDrawerMeasurePolicy
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,7 +24,8 @@ import ru.touchthegrass.tpc.ui.util.tpcDrawerMeasurePolicy
 fun NavigationDrawerContent(
     selectedDestination: String,
     navigateToTopLevelDestination: (TpcTopLevelDestination) -> Unit,
-    onDrawerClicked: () -> Unit = {}
+    createLobby: () -> Unit,
+    closeDrawer: () -> Unit = {}
 ) {
     ModalDrawerSheet {
         Layout(
@@ -47,35 +47,35 @@ fun NavigationDrawerContent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = stringResource(id = R.string.app_name).uppercase(),
+                            text = stringResource(R.string.app_name).uppercase(),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
-                        IconButton(onClick = onDrawerClicked) {
+                        IconButton(onClick = closeDrawer) {
                             Icon(
                                 imageVector = Icons.Default.MenuOpen,
-                                contentDescription = stringResource(id = R.string.navigation_drawer)
+                                contentDescription = stringResource(R.string.navigation_drawer)
                             )
                         }
                     }
 
                     // Create lobby button
                     ExtendedFloatingActionButton(
-                        onClick = { },
+                        onClick = createLobby,
                         modifier = Modifier.fillMaxWidth(),
                         containerColor = MaterialTheme.colorScheme.secondary,
                         contentColor = MaterialTheme.colorScheme.onSecondary
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(id = R.string.add),
+                            contentDescription = stringResource(R.string.add),
                             modifier = Modifier.size(32.dp)
                         )
                         Text(
                             modifier = Modifier
                                 .padding(start = 12.dp)
                                 .weight(1f),
-                            text = stringResource(id = R.string.create_lobby),
+                            text = stringResource(R.string.create_lobby),
                             textAlign = TextAlign.Left
                         )
                     }
@@ -91,14 +91,14 @@ fun NavigationDrawerContent(
                     ) {
                         Icon(
                             imageVector = Icons.Default.PlayArrow,
-                            contentDescription = stringResource(id = R.string.play),
+                            contentDescription = stringResource(R.string.play),
                             modifier = Modifier.size(32.dp)
                         )
                         Text(
                             modifier = Modifier
                                 .padding(start = 12.dp)
                                 .weight(1f),
-                            text = stringResource(id = R.string.create_lobby),
+                            text = stringResource(R.string.rejoin_game),
                             textAlign = TextAlign.Left
                         )
                     }
@@ -121,7 +121,7 @@ fun NavigationDrawerContent(
                     }
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
-                        text = stringResource(id = R.string.settings)
+                        text = stringResource(R.string.settings)
                     )
                     SETTINGS.forEach { tpcDestination ->
                         TpcDrawerItem(
@@ -149,7 +149,7 @@ fun TpcDrawerItem(
         selected = selectedDestination == tpcDestination.route,
         label = {
             Text(
-                text = stringResource(id = tpcDestination.iconTextId),
+                text = stringResource(tpcDestination.iconTextId),
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
         },
@@ -187,7 +187,7 @@ fun TpcBottomNavigationBar(
                 icon = {
                     Icon(
                         imageVector = tpcDestination.selectedIcon,
-                        contentDescription = stringResource(id = tpcDestination.iconTextId)
+                        contentDescription = stringResource(tpcDestination.iconTextId)
                     )
                 }
             )
