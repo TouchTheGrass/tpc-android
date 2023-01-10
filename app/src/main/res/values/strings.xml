@@ -29,10 +29,22 @@
     <string name="timer">Timer</string>
     <string name="apply_filters">Apply filters</string>
 
+    <string name="waiting_players">Waiting players</string>
+    <string name="players">Players</string>
+    <string name="lobby_rules">Lobby rules</string>
+    <string name="not_ready">Not ready</string>
+    <string name="ready">Ready</string>
+    <string name="confirm_readiness">Confirm readiness</string>
+    <string name="cancel_readiness">Cancel readiness</string>
+
+    <string name="lobby_drawer">Lobby drawer</string>
+    <string name="game_rules">Game rules</string>
+
     <string name="todo">TODO</string>
 
     <string name="search">Search</string>
     <string name="filter">Filter</string>
     <string name="back_button">Back</string>
     <string name="chip_icon">Chip icon</string>
+    <string name="rating_icon">Chip icon</string>
 </resources>

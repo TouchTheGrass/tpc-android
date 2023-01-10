@@ -7,7 +7,7 @@ enum class GameRuleType {
 }
 
 data class GameRule(
-    val type: GameRuleType,
-    val icon: ImageVector,
-    val value: String
+    var type: GameRuleType,
+    var icon: ImageVector,
+    var value: String
 )

@@ -19,12 +19,14 @@ import ru.touchthegrass.tpc.data.Lobby
 @Composable
 fun LobbyListItem(
     lobby: Lobby,
-    navigateToLobby: (Long) -> Unit = {}
+    navigateOnLobbyScreen: (Int) -> Unit
 ) {
+    val gameSession = lobby.gameSession
+    val players = lobby.playerInfos.map { it.player }
     Card(
         modifier = Modifier
             .padding(vertical = 4.dp)
-            .clickable { navigateToLobby(lobby.id) },
+            .clickable { navigateOnLobbyScreen(gameSession.id) },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
@@ -42,12 +44,12 @@ fun LobbyListItem(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "${lobby.players.size}/3",
+                    text = "${players.size}/3",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.outline
                 )
                 Text(
-                    text = lobby.players.joinToString { it.name },
+                    text = players.joinToString { it.name },
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -56,7 +58,7 @@ fun LobbyListItem(
                     crossAxisSpacing = (-8).dp,
                     mainAxisSpacing = 8.dp
                 ) {
-                    lobby.rules.forEach { rule ->
+                    gameSession.rules.forEach { rule ->
                         GameRuleChip(
                             icon = rule.icon,
                             title = rule.value

@@ -7,5 +7,5 @@ interface LobbyRepository {
 
     fun getAllLobbies(): Flow<List<Lobby>>
 
-    fun getLobbyById(id: Long): Flow<Lobby>
+    fun getLobbyById(id: Int): Flow<Lobby>
 }

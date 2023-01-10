@@ -21,19 +21,38 @@ class MainActivity : ComponentActivity() {
         setContent {
             TpcTheme {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                val playerState by viewModel.playerState.collectAsStateWithLifecycle()
                 val filterState by viewModel.filterState.collectAsStateWithLifecycle()
+                val lobbyState by viewModel.lobbyState.collectAsStateWithLifecycle()
 
                 TpcApp(
                     tpcHomeUIState = uiState,
+                    tpcPlayerState = playerState,
                     tpcFilterState = filterState,
+                    tpcLobbyState = lobbyState,
                     closeFilterScreen = {
                         viewModel.closeFilterScreen()
                     },
-                    navigateToFilter = {
+                    navigateToFilterScreen = {
                         viewModel.openFilterScreen()
                     },
                     onPlayerFilterChanged = { newValue ->
                         viewModel.changeSearchPlayerFilter(newValue)
+                    },
+                    closeLobbyScreen = {
+                        viewModel.closeLobbyScreen()
+                    },
+                    navigateOnLobbyScreen = { gameSessionId ->
+                        viewModel.setCurrentLobby(gameSessionId)
+                    },
+                    createLobby = {
+                        viewModel.createLobby()
+                    },
+                    onPieceColorChanged = { pieceColor ->
+                        viewModel.setPieceColor(pieceColor)
+                    },
+                    onReadinessChanged = { isReady ->
+                        viewModel.changeReadiness(isReady)
                     }
                 )
             }
