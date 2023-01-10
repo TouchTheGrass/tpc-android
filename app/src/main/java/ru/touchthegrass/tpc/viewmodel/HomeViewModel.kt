@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ru.touchthegrass.tpc.data.*
+import ru.touchthegrass.tpc.data.local.LocalCellsProvider
+import ru.touchthegrass.tpc.data.local.LocalPiecesProvider
 import ru.touchthegrass.tpc.manager.LobbyManager
 import ru.touchthegrass.tpc.manager.local.LocalLobbyManager
 import ru.touchthegrass.tpc.repository.LobbyRepository
@@ -50,6 +52,28 @@ class TpcHomeViewModel(
                         error = ex.message
                     )
                 }.collect { lobbies ->
+
+//                    val lobby = lobbyManager.connectPlayer(
+//                        gameSessionId = lobbyManager.createLobby().gameSession.id,
+//                        playerId = playerState.value.currentPlayer!!.id
+//                    )
+//                    val pieces = LocalPiecesProvider.getWhitePieces(lobby.gameSession)
+//                    val position = listOf("a3", "a4")
+//                    lobby.playerInfos.first().status = PlayerStatus.CURRENT
+//                    _uiState.value = _uiState.value.copy(
+//                        openedLobby = true
+//                    )
+//                    _lobbyState.value = _lobbyState.value.copy(
+//                        gameSession = lobby.gameSession,
+//                        playerGameSessionInfos = lobby.playerInfos,
+//                        lobbies = lobbies,
+//                        cells = LocalCellsProvider.allCells,
+//                        pieces = pieces,
+//                        positions = position,
+//                        selectedPiece = pieces.first(),
+//                        selectedPosition = position.first()
+//                    )
+
                     _lobbyState.value = _lobbyState.value.copy(
                         lobbies = lobbies
                     )
@@ -152,7 +176,12 @@ data class TpcFilterState(
 )
 
 data class TpcLobbyState(
+    val lobbies: List<Lobby> = emptyList(),
     val gameSession: GameSession? = null,
     val playerGameSessionInfos: List<PlayerGameSession> = emptyList(),
-    val lobbies: List<Lobby> = emptyList()
+    val cells: List<Cell> = emptyList(),
+    val pieces: List<Piece> = emptyList(),
+    val positions: List<String> = emptyList(),
+    val selectedPiece: Piece? = null,
+    val selectedPosition: String? = null
 )

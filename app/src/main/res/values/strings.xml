@@ -40,6 +40,10 @@
     <string name="lobby_drawer">Lobby drawer</string>
     <string name="game_rules">Game rules</string>
 
+    <string name="select_piece">Select piece</string>
+    <string name="select_position">Select position</string>
+    <string name="confirm_turn">Confirm turn</string>
+
     <string name="todo">TODO</string>
 
     <string name="search">Search</string>

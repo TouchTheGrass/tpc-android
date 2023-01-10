@@ -14,10 +14,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
+import ru.touchthegrass.tpc.data.GameSessionStatus
 import ru.touchthegrass.tpc.data.PieceColor
 import ru.touchthegrass.tpc.ui.component.LobbyDrawerContent
 import ru.touchthegrass.tpc.ui.navigation.*
 import ru.touchthegrass.tpc.ui.screen.EmptyScreen
+import ru.touchthegrass.tpc.ui.screen.GameScreen
 import ru.touchthegrass.tpc.ui.screen.TpcLobbyScreen
 import ru.touchthegrass.tpc.ui.screen.TpcLobbiesScreen
 import ru.touchthegrass.tpc.ui.util.*
@@ -41,14 +43,25 @@ fun TpcApp(
     onPieceColorChanged: (PieceColor) -> Unit,
     onReadinessChanged: (Boolean) -> Unit
 ) {
+
+//    GameScreen(
+//        tpcPlayerState = tpcPlayerState,
+//        tpcLobbyState = tpcLobbyState
+//    )
+
     if (tpcHomeUIState.openedLobby) {
-        TpcLobbyWrapper(
-            tpcPlayerState = tpcPlayerState,
-            tpcLobbyState = tpcLobbyState,
-            closeLobbyScreen = closeLobbyScreen,
-            onPieceColorChanged = onPieceColorChanged,
-            onReadinessChanged = onReadinessChanged
-        )
+
+        if (tpcLobbyState.gameSession!!.status == GameSessionStatus.GAME) {
+
+        } else {
+            TpcLobbyWrapper(
+                tpcPlayerState = tpcPlayerState,
+                tpcLobbyState = tpcLobbyState,
+                closeLobbyScreen = closeLobbyScreen,
+                onPieceColorChanged = onPieceColorChanged,
+                onReadinessChanged = onReadinessChanged
+            )
+        }
     } else {
         TpcNavigationWrapper(
             tpcHomeUIState = tpcHomeUIState,
