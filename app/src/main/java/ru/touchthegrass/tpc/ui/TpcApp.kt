@@ -18,10 +18,7 @@ import ru.touchthegrass.tpc.data.GameSessionStatus
 import ru.touchthegrass.tpc.data.PieceColor
 import ru.touchthegrass.tpc.ui.component.LobbyDrawerContent
 import ru.touchthegrass.tpc.ui.navigation.*
-import ru.touchthegrass.tpc.ui.screen.EmptyScreen
-import ru.touchthegrass.tpc.ui.screen.GameScreen
-import ru.touchthegrass.tpc.ui.screen.TpcLobbyScreen
-import ru.touchthegrass.tpc.ui.screen.TpcLobbiesScreen
+import ru.touchthegrass.tpc.ui.screen.*
 import ru.touchthegrass.tpc.ui.util.*
 import ru.touchthegrass.tpc.viewmodel.TpcFilterState
 import ru.touchthegrass.tpc.viewmodel.TpcHomeUIState
@@ -44,15 +41,13 @@ fun TpcApp(
     onReadinessChanged: (Boolean) -> Unit
 ) {
 
-//    GameScreen(
-//        tpcPlayerState = tpcPlayerState,
-//        tpcLobbyState = tpcLobbyState
-//    )
-
     if (tpcHomeUIState.openedLobby) {
 
         if (tpcLobbyState.gameSession!!.status == GameSessionStatus.GAME) {
-
+            GameScreen(
+                tpcPlayerState = tpcPlayerState,
+                tpcLobbyState = tpcLobbyState
+            )
         } else {
             TpcLobbyWrapper(
                 tpcPlayerState = tpcPlayerState,
@@ -65,6 +60,7 @@ fun TpcApp(
     } else {
         TpcNavigationWrapper(
             tpcHomeUIState = tpcHomeUIState,
+            tpcPlayerState = tpcPlayerState,
             tpcFilterState = tpcFilterState,
             tpcLobbyState = tpcLobbyState,
             closeFilterScreen = closeFilterScreen,
@@ -144,6 +140,7 @@ fun TpcLobbyContent(
 @Composable
 fun TpcNavigationWrapper(
     tpcHomeUIState: TpcHomeUIState,
+    tpcPlayerState: TpcPlayerState,
     tpcFilterState: TpcFilterState,
     tpcLobbyState: TpcLobbyState,
     closeFilterScreen: () -> Unit,
@@ -179,6 +176,7 @@ fun TpcNavigationWrapper(
     ) {
         TpcTabContent(
             tpcHomeUIState = tpcHomeUIState,
+            tpcPlayerState = tpcPlayerState,
             tpcFilterState = tpcFilterState,
             tpcLobbyState = tpcLobbyState,
             navController = navController,
@@ -196,6 +194,7 @@ fun TpcNavigationWrapper(
 @Composable
 fun TpcTabContent(
     tpcHomeUIState: TpcHomeUIState,
+    tpcPlayerState: TpcPlayerState,
     tpcFilterState: TpcFilterState,
     tpcLobbyState: TpcLobbyState,
     navController: NavHostController,
@@ -219,6 +218,7 @@ fun TpcTabContent(
             modifier = Modifier.weight(1f),
             navController = navController,
             tpcHomeUIState = tpcHomeUIState,
+            tpcPlayerState = tpcPlayerState,
             tpcFilterState = tpcFilterState,
             tpcLobbyState = tpcLobbyState,
             closeFilterScreen = closeFilterScreen,
@@ -241,6 +241,7 @@ private fun TpcNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     tpcHomeUIState: TpcHomeUIState,
+    tpcPlayerState: TpcPlayerState,
     tpcFilterState: TpcFilterState,
     tpcLobbyState: TpcLobbyState,
     closeFilterScreen: () -> Unit,
@@ -267,7 +268,14 @@ private fun TpcNavHost(
             )
         }
         composable(TpcRoute.RATING) {
-            EmptyScreen()
+            TpcRatingScreen(
+                tpcHomeUIState = tpcHomeUIState,
+                tpcPlayerState = tpcPlayerState,
+                tpcFilterState = tpcFilterState,
+                closeFilterScreen = closeFilterScreen,
+                navigateToFilter = navigateToFilter,
+                onPlayerFilterChanged = onPlayerFilterChanged
+            )
         }
         composable(TpcRoute.PROFILE) {
             EmptyScreen()

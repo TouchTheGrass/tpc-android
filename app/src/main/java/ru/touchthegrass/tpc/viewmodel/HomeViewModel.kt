@@ -46,34 +46,23 @@ class TpcHomeViewModel(
                     )
                 }
 
+            playerRepository.getAllPlayers()
+                .catch { ex ->
+                    _uiState.value = TpcHomeUIState(
+                        error = ex.message
+                    )
+                }.collect { players ->
+                    _playerState.value = _playerState.value.copy(
+                        players = players
+                    )
+                }
+
             lobbyRepository.getAllLobbies()
                 .catch { ex ->
                     _uiState.value = TpcHomeUIState(
                         error = ex.message
                     )
                 }.collect { lobbies ->
-
-//                    val lobby = lobbyManager.connectPlayer(
-//                        gameSessionId = lobbyManager.createLobby().gameSession.id,
-//                        playerId = playerState.value.currentPlayer!!.id
-//                    )
-//                    val pieces = LocalPiecesProvider.getWhitePieces(lobby.gameSession)
-//                    val position = listOf("a3", "a4")
-//                    lobby.playerInfos.first().status = PlayerStatus.CURRENT
-//                    _uiState.value = _uiState.value.copy(
-//                        openedLobby = true
-//                    )
-//                    _lobbyState.value = _lobbyState.value.copy(
-//                        gameSession = lobby.gameSession,
-//                        playerGameSessionInfos = lobby.playerInfos,
-//                        lobbies = lobbies,
-//                        cells = LocalCellsProvider.allCells,
-//                        pieces = pieces,
-//                        positions = position,
-//                        selectedPiece = pieces.first(),
-//                        selectedPosition = position.first()
-//                    )
-
                     _lobbyState.value = _lobbyState.value.copy(
                         lobbies = lobbies
                     )
@@ -168,6 +157,7 @@ data class TpcHomeUIState(
 )
 
 data class TpcPlayerState(
+    val players: List<Player> = emptyList(),
     val currentPlayer: Player? = null,
 )
 
