@@ -38,7 +38,8 @@ fun TpcApp(
     navigateOnLobbyScreen: (Int) -> Unit,
     createLobby: () -> Unit,
     onPieceColorChanged: (PieceColor) -> Unit,
-    onReadinessChanged: (Boolean) -> Unit
+    onReadinessChanged: (Boolean) -> Unit,
+    onConfirmTurnPressed: () -> Unit
 ) {
 
     if (tpcHomeUIState.openedLobby) {
@@ -46,7 +47,8 @@ fun TpcApp(
         if (tpcLobbyState.gameSession!!.status == GameSessionStatus.GAME) {
             GameScreen(
                 tpcPlayerState = tpcPlayerState,
-                tpcLobbyState = tpcLobbyState
+                tpcLobbyState = tpcLobbyState,
+                onConfirmTurnPressed = onConfirmTurnPressed
             )
         } else {
             TpcLobbyWrapper(

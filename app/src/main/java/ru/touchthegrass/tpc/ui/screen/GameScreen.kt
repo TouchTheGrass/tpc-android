@@ -23,7 +23,8 @@ import ru.touchthegrass.tpc.viewmodel.TpcPlayerState
 @Composable
 fun GameScreen(
     tpcPlayerState: TpcPlayerState,
-    tpcLobbyState: TpcLobbyState
+    tpcLobbyState: TpcLobbyState,
+    onConfirmTurnPressed: () -> Unit
 ) {
     val cells = tpcLobbyState.cells
     val pieces = tpcLobbyState.pieces
@@ -61,7 +62,7 @@ fun GameScreen(
             items(
                 items = pieces,
                 key = { it.id }
-            ) {piece ->
+            ) { piece ->
                 PieceVariantItem(
                     piece = piece,
                     selected = tpcLobbyState.selectedPiece?.id == piece.id,
@@ -93,9 +94,8 @@ fun GameScreen(
         }
 
         FooterButton(
-            text = bottomButtonText
-        ) {
-
-        }
+            text = bottomButtonText,
+            onClick = onConfirmTurnPressed
+        )
     }
 }
