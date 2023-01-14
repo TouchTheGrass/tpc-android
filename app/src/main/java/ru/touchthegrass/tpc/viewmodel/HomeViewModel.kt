@@ -147,6 +147,10 @@ class TpcHomeViewModel(
             playerGameSessionInfos = updatedInfos
         )
     }
+
+    fun movePiece() {
+        // TODO
+    }
 }
 
 data class TpcHomeUIState(
