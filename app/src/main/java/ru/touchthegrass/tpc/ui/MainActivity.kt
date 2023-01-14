@@ -53,6 +53,9 @@ class MainActivity : ComponentActivity() {
                     },
                     onReadinessChanged = { isReady ->
                         viewModel.changeReadiness(isReady)
+                    },
+                    onConfirmTurnPressed = {
+                        viewModel.movePiece()
                     }
                 )
             }
