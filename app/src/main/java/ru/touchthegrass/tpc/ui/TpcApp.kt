@@ -33,6 +33,8 @@ fun TpcApp(
     tpcPlayerState: TpcPlayerState,
     tpcFilterState: TpcFilterState,
     tpcLobbyState: TpcLobbyState,
+    loginUser: (String, String) -> Unit,
+    navigateToRegistrationScreen: () -> Unit,
     closeFilterScreen: () -> Unit,
     navigateToFilterScreen: () -> Unit,
     onPlayerFilterChanged: (String) -> Unit,
@@ -44,7 +46,14 @@ fun TpcApp(
     onConfirmTurnPressed: () -> Unit
 ) {
 
-    if (tpcHomeUIState.openedLobby) {
+    if (tpcPlayerState.currentPlayer == null) {
+        LoginScreen(
+            onLoginPressed = loginUser,
+            onRegisterPressed = {
+
+            }
+        )
+    } else if (tpcHomeUIState.openedLobby) {
 
         if (tpcLobbyState.gameSession!!.status == GameSessionStatus.GAME) {
             GameScreen(

@@ -6,18 +6,20 @@ import ru.touchthegrass.tpc.data.Player
 import ru.touchthegrass.tpc.data.local.LocalPlayerProvider
 import ru.touchthegrass.tpc.repository.PlayerRepository
 
-class LocalPlayerRepository: PlayerRepository {
-
-    override fun getCurrentPlayer(): Flow<Player> = flow {
-        emit(LocalPlayerProvider.currentPlayer)
-    }
+class LocalPlayerRepository : PlayerRepository {
 
     override fun getAllPlayers(): Flow<List<Player>> = flow {
         emit(LocalPlayerProvider.allPlayers)
     }
 
-    override fun getPlayerByUid(id: Int): Flow<Player> = flow {
-        emit(LocalPlayerProvider.getPlayerById(id))
+    override fun getPlayerById(id: Int): Player {
+        return LocalPlayerProvider.getPlayerById(id)
     }
 
+    override fun getPlayerByCredential(email: String, password: String): Player? {
+        return LocalPlayerProvider.allPlayers
+            .find {
+                it.email == email && it.password == password
+            }
+    }
 }

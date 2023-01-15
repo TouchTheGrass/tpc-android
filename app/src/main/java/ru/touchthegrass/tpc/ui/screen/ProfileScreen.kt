@@ -15,7 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ru.touchthegrass.tpc.data.*
 import ru.touchthegrass.tpc.ui.component.ProfileHistoryListItem
-import ru.touchthegrass.tpc.ui.component.TpcSearchPlayerBar
+import ru.touchthegrass.tpc.ui.component.SearchPlayerField
 import ru.touchthegrass.tpc.model.TpcFilterState
 import ru.touchthegrass.tpc.model.TpcPlayerState
 
@@ -48,7 +48,7 @@ fun TpcProfileScreen(
             }
 
             item {
-                TpcSearchPlayerBar(
+                SearchPlayerField(
                     value = tpcFilterState.playerFilter,
                     onValueChange = onPlayerFilterChanged,
                     navigateToFilter = navigateToFilter

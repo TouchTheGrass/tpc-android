@@ -11,7 +11,6 @@ import ru.touchthegrass.tpc.manager.LobbyManager
 import ru.touchthegrass.tpc.repository.LobbyRepository
 
 class LocalLobbyManager(
-    val coroutineScope: CoroutineScope,
     override val lobbyRepository: LobbyRepository
 ) : LobbyManager {
 

@@ -21,7 +21,7 @@ import ru.touchthegrass.tpc.R
 import ru.touchthegrass.tpc.data.Lobby
 import ru.touchthegrass.tpc.model.TpcHomeUIState
 import ru.touchthegrass.tpc.ui.component.LobbyListItem
-import ru.touchthegrass.tpc.ui.component.TpcSearchPlayerBar
+import ru.touchthegrass.tpc.ui.component.SearchPlayerField
 import ru.touchthegrass.tpc.model.TpcFilterState
 import ru.touchthegrass.tpc.model.TpcLobbyState
 
@@ -94,7 +94,7 @@ fun TpcLobbyList(
     ) {
 
         item {
-            TpcSearchPlayerBar(
+            SearchPlayerField(
                 value = playerFilter,
                 onValueChange = onPlayerFilterChanged,
                 navigateToFilter = navigateToFilter

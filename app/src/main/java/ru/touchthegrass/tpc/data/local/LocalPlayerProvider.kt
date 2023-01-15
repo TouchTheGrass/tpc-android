@@ -11,13 +11,12 @@ object LocalPlayerProvider : LocalProvider() {
         Player(
             id = id,
             name = "Player $id",
-            rating = Random.nextInt(1, 10000)
+            email = "player$id@example.com",
+            rating = 0
         )
     }
 
-    val currentPlayer = allPlayers.first()
-
-    private val usedPlayers = mutableListOf(currentPlayer)
+    private val usedPlayers = mutableListOf(allPlayers.first())
 
     fun getRandomGroup(
         min: Int,

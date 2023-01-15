@@ -6,7 +6,9 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ru.touchthegrass.tpc.data.*
 import ru.touchthegrass.tpc.manager.LobbyManager
+import ru.touchthegrass.tpc.manager.UserManager
 import ru.touchthegrass.tpc.manager.local.LocalLobbyManager
+import ru.touchthegrass.tpc.manager.local.LocalUserManager
 import ru.touchthegrass.tpc.repository.LobbyRepository
 import ru.touchthegrass.tpc.repository.PlayerRepository
 import ru.touchthegrass.tpc.repository.local.LocalLobbyRepository
@@ -17,7 +19,8 @@ class TpcHomeViewModel(
     private val playerRepository: PlayerRepository = LocalPlayerRepository()
 ) : ViewModel() {
 
-    private val lobbyManager: LobbyManager = LocalLobbyManager(viewModelScope, lobbyRepository)
+    private val lobbyManager: LobbyManager = LocalLobbyManager(lobbyRepository)
+    private val userManager: UserManager = LocalUserManager(playerRepository)
 
     private val _uiState = MutableStateFlow(TpcHomeUIState(loading = true))
     val uiState: StateFlow<TpcHomeUIState> = _uiState
@@ -34,34 +37,13 @@ class TpcHomeViewModel(
     init {
         viewModelScope.launch {
 
-            playerRepository.getCurrentPlayer()
-                .catch { ex ->
-                    _uiState.value = TpcHomeUIState(
-                        error = ex.message
-                    )
-                }.collect { currentPlayer ->
-                    _playerState.value = _playerState.value.copy(
-                        currentPlayer = currentPlayer
-                    )
-                }
-
-            lobbyRepository.getCurrentPlayerHistory()
-                .catch { ex ->
-                    _uiState.value = TpcHomeUIState(
-                        error = ex.message
-                    )
-                }.collect { currentPlayerInfos ->
-                    _playerState.value = _playerState.value.copy(
-                        currentPlayerHistory = currentPlayerInfos
-                    )
-                }
-
             playerRepository.getAllPlayers()
                 .catch { ex ->
                     _uiState.value = TpcHomeUIState(
                         error = ex.message
                     )
-                }.collect { players ->
+                }
+                .collect { players ->
                     _playerState.value = _playerState.value.copy(
                         players = players
                     )
@@ -72,12 +54,49 @@ class TpcHomeViewModel(
                     _uiState.value = TpcHomeUIState(
                         error = ex.message
                     )
-                }.collect { lobbies ->
+                }
+                .collect { lobbies ->
                     _lobbyState.value = _lobbyState.value.copy(
                         lobbies = lobbies
                     )
                 }
         }
+    }
+
+    fun loginUser(email: String, password: String) {
+        val authenticatedPlayer = userManager.loginUser(email, password)
+        if (authenticatedPlayer == null) {
+            _uiState.value = _uiState.value.copy(
+                error = "User not found"
+            )
+        } else {
+            _playerState.value = _playerState.value.copy(
+                currentPlayer = authenticatedPlayer
+            )
+
+            viewModelScope.launch {
+                lobbyRepository.getPlayerHistory(_playerState.value.currentPlayer!!.id)
+                    .catch { ex ->
+                        _uiState.value = TpcHomeUIState(
+                            error = ex.message
+                        )
+                    }
+                    .takeWhile {
+                        _playerState.value.currentPlayer != null
+                    }
+                    .collect { currentPlayerInfos ->
+                        _playerState.value = _playerState.value.copy(
+                            currentPlayerHistory = currentPlayerInfos
+                        )
+                    }
+            }
+        }
+    }
+
+    fun logoutUser() {
+        _playerState.value = _playerState.value.copy(
+            currentPlayer = null
+        )
     }
 
     fun closeFilterScreen() {
