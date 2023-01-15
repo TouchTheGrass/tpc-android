@@ -12,6 +12,10 @@ class LocalUserManager(override val playerRepository: PlayerRepository): UserMan
         return playerRepository.getPlayerByCredential(email, password)
     }
 
+    override fun registerUser(email: String, name: String, password: String): Player {
+        return playerRepository.createPlayer(email, name, password)
+    }
+
     override fun logoutUser() {
         currentPlayer = null
     }

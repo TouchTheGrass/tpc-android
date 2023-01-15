@@ -33,8 +33,14 @@ class MainActivity : ComponentActivity() {
                     loginUser = { email, password ->
                         viewModel.loginUser(email, password)
                     },
+                    registerUser = { email, name, password ->
+                        viewModel.registerUser(email, name, password)
+                    },
+                    navigateToLoginScreen = {
+                        viewModel.openLoginScreen()
+                    },
                     navigateToRegistrationScreen = {
-
+                        viewModel.openRegisterScreen()
                     },
                     closeFilterScreen = {
                         viewModel.closeFilterScreen()

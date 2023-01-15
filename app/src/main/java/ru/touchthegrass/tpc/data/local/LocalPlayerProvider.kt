@@ -6,15 +6,17 @@ import kotlin.random.Random
 
 object LocalPlayerProvider : LocalProvider() {
 
-    val allPlayers = (1..21).map {
-        val id = getId()
-        Player(
-            id = id,
-            name = "Player $id",
-            email = "player$id@example.com",
-            rating = 0
-        )
-    }
+    val allPlayers = (1..21)
+        .map {
+            val id = getId()
+            Player(
+                id = id,
+                name = "Player $id",
+                email = "player$id@example.com",
+                rating = 0
+            )
+        }
+        .toMutableList()
 
     private val usedPlayers = mutableListOf(allPlayers.first())
 
@@ -35,5 +37,18 @@ object LocalPlayerProvider : LocalProvider() {
 
     fun getPlayerById(playerId: Int): Player {
         return allPlayers.first { it.id == playerId }
+    }
+
+    fun createPlayer(email: String, name: String, password: String): Player {
+        val id = getId()
+        val player = Player(
+            id = id,
+            name = name,
+            email = email,
+            password = password,
+            rating = 0
+        )
+        allPlayers.add(player)
+        return player
     }
 }

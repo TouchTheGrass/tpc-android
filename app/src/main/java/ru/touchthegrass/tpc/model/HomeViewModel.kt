@@ -93,9 +93,50 @@ class TpcHomeViewModel(
         }
     }
 
+    fun registerUser(email: String, name: String, password: String) {
+        val registeredPlayer = userManager.registerUser(email, name, password)
+
+        _playerState.value = _playerState.value.copy(
+            currentPlayer = registeredPlayer
+        )
+
+        _uiState.value = _uiState.value.copy(
+            openedRegister = false
+        )
+
+        viewModelScope.launch {
+            lobbyRepository.getPlayerHistory(_playerState.value.currentPlayer!!.id)
+                .catch { ex ->
+                    _uiState.value = TpcHomeUIState(
+                        error = ex.message
+                    )
+                }
+                .takeWhile {
+                    _playerState.value.currentPlayer != null
+                }
+                .collect { currentPlayerInfos ->
+                    _playerState.value = _playerState.value.copy(
+                        currentPlayerHistory = currentPlayerInfos
+                    )
+                }
+        }
+    }
+
     fun logoutUser() {
         _playerState.value = _playerState.value.copy(
             currentPlayer = null
+        )
+    }
+
+    fun openLoginScreen() {
+        _uiState.value = _uiState.value.copy(
+            openedRegister = false
+        )
+    }
+
+    fun openRegisterScreen() {
+        _uiState.value = _uiState.value.copy(
+            openedRegister = true
         )
     }
 
@@ -183,6 +224,7 @@ class TpcHomeViewModel(
 }
 
 data class TpcHomeUIState(
+    val openedRegister: Boolean = false,
     val openedFilter: Boolean = false,
     val openedLobby: Boolean = false,
     val loading: Boolean = false,

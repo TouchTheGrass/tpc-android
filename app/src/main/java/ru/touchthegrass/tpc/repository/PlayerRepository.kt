@@ -10,4 +10,6 @@ interface PlayerRepository {
     fun getPlayerById(id: Int): Player
 
     fun getPlayerByCredential(email: String, password: String): Player?
+
+    fun createPlayer(email: String, name: String, password: String): Player
 }
