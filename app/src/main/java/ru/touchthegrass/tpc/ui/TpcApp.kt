@@ -16,14 +16,16 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import ru.touchthegrass.tpc.data.GameSessionStatus
 import ru.touchthegrass.tpc.data.PieceColor
-import ru.touchthegrass.tpc.ui.component.LobbyDrawerContent
+import ru.touchthegrass.tpc.ui.component.BottomNavigationBar
+import ru.touchthegrass.tpc.ui.component.LobbyDrawer
+import ru.touchthegrass.tpc.ui.component.NavigationDrawer
 import ru.touchthegrass.tpc.ui.navigation.*
 import ru.touchthegrass.tpc.ui.screen.*
 import ru.touchthegrass.tpc.ui.util.*
-import ru.touchthegrass.tpc.viewmodel.TpcFilterState
-import ru.touchthegrass.tpc.viewmodel.TpcHomeUIState
-import ru.touchthegrass.tpc.viewmodel.TpcLobbyState
-import ru.touchthegrass.tpc.viewmodel.TpcPlayerState
+import ru.touchthegrass.tpc.model.TpcFilterState
+import ru.touchthegrass.tpc.model.TpcHomeUIState
+import ru.touchthegrass.tpc.model.TpcLobbyState
+import ru.touchthegrass.tpc.model.TpcPlayerState
 
 @Composable
 fun TpcApp(
@@ -89,7 +91,7 @@ fun TpcLobbyWrapper(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            LobbyDrawerContent(
+            LobbyDrawer(
                 rules = tpcLobbyState.gameSession?.rules ?: error("Current lobby is nullable"),
                 closeDrawer = {
                     scope.launch {
@@ -163,7 +165,7 @@ fun TpcNavigationWrapper(
 
     ModalNavigationDrawer(
         drawerContent = {
-            NavigationDrawerContent(
+            NavigationDrawer(
                 selectedDestination = selectedDestination,
                 navigateToTopLevelDestination = navigationActions::navigateTo,
                 createLobby = createLobby,
@@ -230,7 +232,7 @@ fun TpcTabContent(
             createLobby = createLobby
         )
         if (navBarEnabled) {
-            TpcBottomNavigationBar(
+            BottomNavigationBar(
                 selectedDestination = selectedDestination,
                 navigateToTopLevelDestination = navigateToTopLevelDestination
             )
@@ -280,7 +282,12 @@ private fun TpcNavHost(
             )
         }
         composable(TpcRoute.PROFILE) {
-            EmptyScreen()
+            TpcProfileScreen(
+                tpcPlayerState = tpcPlayerState,
+                tpcFilterState = tpcFilterState,
+                navigateToFilter = navigateToFilter,
+                onPlayerFilterChanged = onPlayerFilterChanged,
+            )
         }
     }
 }

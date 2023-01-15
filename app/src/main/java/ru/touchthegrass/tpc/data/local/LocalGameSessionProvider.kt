@@ -3,23 +3,31 @@ package ru.touchthegrass.tpc.data.local
 import ru.touchthegrass.tpc.data.GameSession
 import ru.touchthegrass.tpc.data.GameSessionStatus
 
-object LocalGameSessionProvider {
+object LocalGameSessionProvider: LocalProvider() {
 
-    val allGameSessions = (1..10).map { id ->
+    val activeGameSessions = (1..10).map {
         GameSession(
-            id = id,
+            id = getId(),
             status = GameSessionStatus.WAIT,
+            rules = LocalGameRulesProvider.standartRules
+        )
+    }.toMutableList()
+
+    val completedGameSessions = (1..100).map {
+        GameSession(
+            id = getId(),
+            status = GameSessionStatus.COMPLETED,
             rules = LocalGameRulesProvider.standartRules
         )
     }.toMutableList()
 
     fun createGameSession(): GameSession {
         val gameSession = GameSession(
-            id = allGameSessions.maxOf { it.id } + 1,
+            id = getId(),
             status = GameSessionStatus.WAIT,
             rules = LocalGameRulesProvider.standartRules
         )
-        allGameSessions.add(gameSession)
+        activeGameSessions.add(gameSession)
         return gameSession
     }
 }

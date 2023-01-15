@@ -5,7 +5,11 @@ import ru.touchthegrass.tpc.data.Lobby
 
 interface LobbyRepository {
 
-    fun getAllLobbies(): Flow<List<Lobby>>
+    fun getActiveLobbies(): Flow<List<Lobby>>
 
-    fun getLobbyById(id: Int): Flow<Lobby>
+    fun getCurrentPlayerHistory(): Flow<List<Lobby>>
+
+    fun getLobbyByGameSessionId(id: Int): Lobby
+
+    fun createLobby(lobby: Lobby): Lobby
 }

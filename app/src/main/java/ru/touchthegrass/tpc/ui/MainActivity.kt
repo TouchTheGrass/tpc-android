@@ -8,7 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.touchthegrass.tpc.ui.theme.TpcTheme
-import ru.touchthegrass.tpc.viewmodel.TpcHomeViewModel
+import ru.touchthegrass.tpc.model.TpcHomeViewModel
 
 class MainActivity : ComponentActivity() {
 

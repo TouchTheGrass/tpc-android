@@ -3,7 +3,7 @@ package ru.touchthegrass.tpc.data.local
 import ru.touchthegrass.tpc.data.Cell
 import ru.touchthegrass.tpc.R
 
-object LocalCellsProvider {
+object LocalCellsProvider: LocalProvider() {
 
     val coordinateFirstParts = listOf("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l")
     val coordinateSecondParts = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")

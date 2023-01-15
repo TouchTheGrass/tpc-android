@@ -5,7 +5,7 @@ import androidx.compose.material.icons.filled.*
 import ru.touchthegrass.tpc.data.GameRule
 import ru.touchthegrass.tpc.data.GameRuleType
 
-object LocalGameRulesProvider {
+object LocalGameRulesProvider: LocalProvider() {
 
     val standartRules = listOf(
         GameRule(

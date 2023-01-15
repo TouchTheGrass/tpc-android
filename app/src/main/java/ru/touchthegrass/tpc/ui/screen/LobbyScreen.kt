@@ -72,7 +72,7 @@ fun TpcLobbyScreen(
             }
         }
 
-        FooterButton(
+        BottomButtonBar(
             text = if (isReady) stringResource(R.string.cancel_readiness) else stringResource(R.string.confirm_readiness),
         ) {
             onReadinessChanged(!isReady)

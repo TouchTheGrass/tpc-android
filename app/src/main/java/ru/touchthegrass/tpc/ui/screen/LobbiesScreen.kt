@@ -19,11 +19,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.touchthegrass.tpc.R
 import ru.touchthegrass.tpc.data.Lobby
-import ru.touchthegrass.tpc.viewmodel.TpcHomeUIState
+import ru.touchthegrass.tpc.model.TpcHomeUIState
 import ru.touchthegrass.tpc.ui.component.LobbyListItem
 import ru.touchthegrass.tpc.ui.component.TpcSearchPlayerBar
-import ru.touchthegrass.tpc.viewmodel.TpcFilterState
-import ru.touchthegrass.tpc.viewmodel.TpcLobbyState
+import ru.touchthegrass.tpc.model.TpcFilterState
+import ru.touchthegrass.tpc.model.TpcLobbyState
 
 @Composable
 fun TpcLobbiesScreen(

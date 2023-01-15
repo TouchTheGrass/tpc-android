@@ -15,11 +15,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.touchthegrass.tpc.R
 import ru.touchthegrass.tpc.data.Player
-import ru.touchthegrass.tpc.ui.component.PlayerListItem
+import ru.touchthegrass.tpc.ui.component.RatingPlayerListItem
 import ru.touchthegrass.tpc.ui.component.TpcSearchPlayerBar
-import ru.touchthegrass.tpc.viewmodel.TpcFilterState
-import ru.touchthegrass.tpc.viewmodel.TpcHomeUIState
-import ru.touchthegrass.tpc.viewmodel.TpcPlayerState
+import ru.touchthegrass.tpc.model.TpcFilterState
+import ru.touchthegrass.tpc.model.TpcHomeUIState
+import ru.touchthegrass.tpc.model.TpcPlayerState
 
 @Composable
 fun TpcRatingScreen(
@@ -97,7 +97,7 @@ fun TpcRatingList(
                 items = players,
                 key = { it.id }
             ) { player ->
-                PlayerListItem(
+                RatingPlayerListItem(
                     index = index++,
                     player = player
                 )

@@ -4,9 +4,10 @@ import ru.touchthegrass.tpc.data.Player
 import java.lang.Integer.min
 import kotlin.random.Random
 
-object LocalPlayerProvider {
+object LocalPlayerProvider : LocalProvider() {
 
-    val allPlayers = (0..20).map { id ->
+    val allPlayers = (1..21).map {
+        val id = getId()
         Player(
             id = id,
             name = "Player $id",
@@ -18,14 +19,19 @@ object LocalPlayerProvider {
 
     private val usedPlayers = mutableListOf(currentPlayer)
 
-    fun getRandomGroup(): List<Player> {
-        val number = min(allPlayers.size - usedPlayers.size, Random.nextInt(1, 3))
-        val playerList = allPlayers
-            .filterNot { usedPlayers.contains(it) }
-            .shuffled()
+    fun getRandomGroup(
+        min: Int,
+        max: Int,
+        excluding: Boolean = false
+    ): List<Player> {
+        val availablePlayers = if (excluding) allPlayers.filterNot { usedPlayers.contains(it) } else allPlayers
+        val number = min(availablePlayers.size, Random.nextInt(min, max + 1))
+        val group = availablePlayers.shuffled()
             .subList(0, number)
-        usedPlayers.addAll(playerList)
-        return playerList
+        if (excluding) {
+            usedPlayers.addAll(group)
+        }
+        return group
     }
 
     fun getPlayerById(playerId: Int): Player {

@@ -1,12 +1,10 @@
-package ru.touchthegrass.tpc.viewmodel
+package ru.touchthegrass.tpc.model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ru.touchthegrass.tpc.data.*
-import ru.touchthegrass.tpc.data.local.LocalCellsProvider
-import ru.touchthegrass.tpc.data.local.LocalPiecesProvider
 import ru.touchthegrass.tpc.manager.LobbyManager
 import ru.touchthegrass.tpc.manager.local.LocalLobbyManager
 import ru.touchthegrass.tpc.repository.LobbyRepository
@@ -16,9 +14,10 @@ import ru.touchthegrass.tpc.repository.local.LocalPlayerRepository
 
 class TpcHomeViewModel(
     private val lobbyRepository: LobbyRepository = LocalLobbyRepository(),
-    private val playerRepository: PlayerRepository = LocalPlayerRepository(),
-    private val lobbyManager: LobbyManager = LocalLobbyManager(),
+    private val playerRepository: PlayerRepository = LocalPlayerRepository()
 ) : ViewModel() {
+
+    private val lobbyManager: LobbyManager = LocalLobbyManager(viewModelScope, lobbyRepository)
 
     private val _uiState = MutableStateFlow(TpcHomeUIState(loading = true))
     val uiState: StateFlow<TpcHomeUIState> = _uiState
@@ -46,6 +45,17 @@ class TpcHomeViewModel(
                     )
                 }
 
+            lobbyRepository.getCurrentPlayerHistory()
+                .catch { ex ->
+                    _uiState.value = TpcHomeUIState(
+                        error = ex.message
+                    )
+                }.collect { currentPlayerInfos ->
+                    _playerState.value = _playerState.value.copy(
+                        currentPlayerHistory = currentPlayerInfos
+                    )
+                }
+
             playerRepository.getAllPlayers()
                 .catch { ex ->
                     _uiState.value = TpcHomeUIState(
@@ -57,7 +67,7 @@ class TpcHomeViewModel(
                     )
                 }
 
-            lobbyRepository.getAllLobbies()
+            lobbyRepository.getActiveLobbies()
                 .catch { ex ->
                     _uiState.value = TpcHomeUIState(
                         error = ex.message
@@ -163,6 +173,7 @@ data class TpcHomeUIState(
 data class TpcPlayerState(
     val players: List<Player> = emptyList(),
     val currentPlayer: Player? = null,
+    val currentPlayerHistory: List<Lobby> = emptyList()
 )
 
 data class TpcFilterState(
