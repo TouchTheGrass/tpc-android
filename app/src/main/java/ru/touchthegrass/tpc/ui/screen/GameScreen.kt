@@ -11,14 +11,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import ru.touchthegrass.tpc.ui.component.FooterButton
+import ru.touchthegrass.tpc.ui.component.BottomButtonBar
 import ru.touchthegrass.tpc.ui.component.QuadrangleBoard
-import ru.touchthegrass.tpc.viewmodel.TpcLobbyState
+import ru.touchthegrass.tpc.model.TpcLobbyState
 import ru.touchthegrass.tpc.R
 import ru.touchthegrass.tpc.data.PlayerStatus
 import ru.touchthegrass.tpc.ui.component.PieceVariantItem
 import ru.touchthegrass.tpc.ui.component.PositionVariantItem
-import ru.touchthegrass.tpc.viewmodel.TpcPlayerState
+import ru.touchthegrass.tpc.model.TpcPlayerState
 
 @Composable
 fun GameScreen(
@@ -33,7 +33,7 @@ fun GameScreen(
     val pieceListState = rememberLazyListState()
     val positionListState = rememberLazyListState()
 
-    val whoseMove = tpcLobbyState.playerGameSessionInfos.firstOrNull() { it.status == PlayerStatus.CURRENT }
+    val whoseMove = tpcLobbyState.playerGameSessionInfos.firstOrNull() { it.status == PlayerStatus.CURRENT_TURN }
     val bottomButtonText = if (whoseMove?.player?.id == tpcPlayerState.currentPlayer!!.id) {
         if (tpcLobbyState.selectedPiece == null) stringResource(R.string.select_piece)
         else if (tpcLobbyState.selectedPosition == null) stringResource(R.string.select_position)
@@ -93,7 +93,7 @@ fun GameScreen(
             }
         }
 
-        FooterButton(
+        BottomButtonBar(
             text = bottomButtonText,
             onClick = onConfirmTurnPressed
         )

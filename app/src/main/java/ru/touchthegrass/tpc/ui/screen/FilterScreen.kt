@@ -15,8 +15,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.touchthegrass.tpc.R
-import ru.touchthegrass.tpc.ui.component.FooterButton
-import ru.touchthegrass.tpc.ui.component.TcpFilterSwitchItem
+import ru.touchthegrass.tpc.ui.component.BottomButtonBar
+import ru.touchthegrass.tpc.ui.component.SwitchListItem
 
 @Preview
 @Composable
@@ -47,7 +47,7 @@ fun TpcFilterScreen(
                 )
             }
             item {
-                TcpFilterSwitchItem(
+                SwitchListItem(
                     icon = Icons.Default.Square,
                     text = stringResource(id = R.string.quadrangle),
                     checked = true
@@ -61,7 +61,7 @@ fun TpcFilterScreen(
                 )
             }
             item {
-                TcpFilterSwitchItem(
+                SwitchListItem(
                     icon = Icons.Default.FirstPage,
                     text = stringResource(id = R.string.first_checkmate),
                     checked = true
@@ -75,14 +75,14 @@ fun TpcFilterScreen(
                 )
             }
             item {
-                TcpFilterSwitchItem(
+                SwitchListItem(
                     icon = Icons.Default.Timer,
                     text = stringResource(id = R.string.timer),
                     checked = false
                 )
             }
         }
-        FooterButton(
+        BottomButtonBar(
             text = stringResource(id = R.string.apply_filters),
             onClick = closeFilterScreen
         )

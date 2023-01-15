@@ -4,8 +4,11 @@ import ru.touchthegrass.tpc.data.Lobby
 import ru.touchthegrass.tpc.data.PieceColor
 import ru.touchthegrass.tpc.data.PlayerGameSession
 import ru.touchthegrass.tpc.data.PlayerStatus
+import ru.touchthegrass.tpc.repository.LobbyRepository
 
 interface LobbyManager {
+
+    val lobbyRepository: LobbyRepository
 
     fun createLobby(): Lobby
 

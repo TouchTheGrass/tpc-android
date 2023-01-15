@@ -5,10 +5,7 @@ import ru.touchthegrass.tpc.data.Piece
 import ru.touchthegrass.tpc.data.PieceColor
 import ru.touchthegrass.tpc.data.PieceType
 
-object LocalPiecesProvider {
-
-    private var id = 1
-    private fun getId() = id++
+object LocalPiecesProvider: LocalProvider() {
 
     fun getTestPieces(gameSession: GameSession) = LocalCellsProvider.coordinateFirstParts.flatMap { first ->
         LocalCellsProvider.coordinateSecondParts.map { second ->
