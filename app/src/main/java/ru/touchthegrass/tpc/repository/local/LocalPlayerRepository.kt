@@ -22,4 +22,8 @@ class LocalPlayerRepository : PlayerRepository {
                 it.email == email && it.password == password
             }
     }
+
+    override fun createPlayer(email: String, name: String, password: String): Player {
+        return LocalPlayerProvider.createPlayer(email, name, password)
+    }
 }

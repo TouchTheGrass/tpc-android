@@ -9,6 +9,7 @@ import ru.touchthegrass.tpc.data.PlayerStatus
 import ru.touchthegrass.tpc.data.local.LocalGameSessionProvider
 import ru.touchthegrass.tpc.data.local.LocalPlayerProvider
 import ru.touchthegrass.tpc.repository.LobbyRepository
+import java.lang.Integer.max
 import kotlin.random.Random
 
 class LocalLobbyRepository : LobbyRepository {
@@ -46,7 +47,7 @@ class LocalLobbyRepository : LobbyRepository {
                         val isWinner = player.id == winner.id
                         val scores = if (isWinner) Random.nextInt(10, 200)
                         else Random.nextInt(-200, -10)
-                        player.rating += scores
+                        player.rating = max(0, player.rating + scores)
                         PlayerGameSession(
                             player = player,
                             gameSession = gameSession,

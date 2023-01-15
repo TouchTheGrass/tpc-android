@@ -11,5 +11,7 @@ interface UserManager {
 
     fun loginUser(email: String, password: String): Player?
 
+    fun registerUser(email: String, name: String, password: String): Player
+
     fun logoutUser()
 }
