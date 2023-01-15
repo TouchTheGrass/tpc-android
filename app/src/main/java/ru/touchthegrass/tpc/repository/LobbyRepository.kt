@@ -7,9 +7,9 @@ interface LobbyRepository {
 
     fun getActiveLobbies(): Flow<List<Lobby>>
 
-    fun getCurrentPlayerHistory(): Flow<List<Lobby>>
+    fun getPlayerHistory(playerId: Int): Flow<List<Lobby>>
 
-    fun getLobbyByGameSessionId(id: Int): Lobby
+    fun getLobbyByGameSessionId(gameSessionId: Int): Lobby
 
     fun createLobby(lobby: Lobby): Lobby
 }

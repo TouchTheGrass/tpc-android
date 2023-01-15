@@ -37,22 +37,23 @@ class LocalLobbyRepository : LobbyRepository {
 
     val completedLobbies = LocalGameSessionProvider.completedGameSessions
         .map { gameSession ->
-            println(gameSession.id)
             val group = LocalPlayerProvider.getRandomGroup(min = 3, max = 3)
-            println(group)
             val winner = group.random()
             Lobby(
                 gameSession = gameSession,
                 playerInfos = group
                     .mapIndexed { index, player ->
                         val isWinner = player.id == winner.id
+                        val scores = if (isWinner) Random.nextInt(10, 200)
+                        else Random.nextInt(-200, -10)
+                        player.rating += scores
                         PlayerGameSession(
                             player = player,
                             gameSession = gameSession,
                             status = PlayerStatus.DISCONNECTED,
                             color = PieceColor.values()[index],
                             isWinner = isWinner,
-                            scores = if (isWinner) Random.nextInt(10, 200) else Random.nextInt(-200, -10)
+                            scores = scores
                         )
                     }
                     .toMutableList()
@@ -64,20 +65,19 @@ class LocalLobbyRepository : LobbyRepository {
         emit(activeLobbies)
     }
 
-    override fun getCurrentPlayerHistory(): Flow<List<Lobby>> = flow {
-        val currentPlayer = LocalPlayerProvider.currentPlayer
+    override fun getPlayerHistory(playerId: Int): Flow<List<Lobby>> = flow {
         emit(
             completedLobbies.filter { lobby ->
                 val playerInfo = lobby.playerInfos
-                    .find { it.player.id == currentPlayer.id }
+                    .find { it.player.id == playerId }
                     ?: return@filter false
                 playerInfo.status == PlayerStatus.DONE || playerInfo.status == PlayerStatus.DISCONNECTED
             }
         )
     }
 
-    override fun getLobbyByGameSessionId(id: Int): Lobby {
-        return (activeLobbies + completedLobbies).first { it.gameSession.id == id }
+    override fun getLobbyByGameSessionId(gameSessionId: Int): Lobby {
+        return (activeLobbies + completedLobbies).first { it.gameSession.id == gameSessionId }
     }
 
     override fun createLobby(lobby: Lobby): Lobby {

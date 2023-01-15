@@ -5,9 +5,9 @@ import ru.touchthegrass.tpc.data.Player
 
 interface PlayerRepository {
 
-    fun getCurrentPlayer(): Flow<Player>
-
     fun getAllPlayers(): Flow<List<Player>>
 
-    fun getPlayerByUid(id: Int): Flow<Player>
+    fun getPlayerById(id: Int): Player
+
+    fun getPlayerByCredential(email: String, password: String): Player?
 }

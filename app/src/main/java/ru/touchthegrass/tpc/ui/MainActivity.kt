@@ -30,6 +30,12 @@ class MainActivity : ComponentActivity() {
                     tpcPlayerState = playerState,
                     tpcFilterState = filterState,
                     tpcLobbyState = lobbyState,
+                    loginUser = { email, password ->
+                        viewModel.loginUser(email, password)
+                    },
+                    navigateToRegistrationScreen = {
+
+                    },
                     closeFilterScreen = {
                         viewModel.closeFilterScreen()
                     },

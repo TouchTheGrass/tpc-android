@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import ru.touchthegrass.tpc.R
 import ru.touchthegrass.tpc.data.Player
 import ru.touchthegrass.tpc.ui.component.RatingPlayerListItem
-import ru.touchthegrass.tpc.ui.component.TpcSearchPlayerBar
+import ru.touchthegrass.tpc.ui.component.SearchPlayerField
 import ru.touchthegrass.tpc.model.TpcFilterState
 import ru.touchthegrass.tpc.model.TpcHomeUIState
 import ru.touchthegrass.tpc.model.TpcPlayerState
@@ -69,7 +69,7 @@ fun TpcRatingList(
         state = lobbyLazyListState
     ) {
         item {
-            TpcSearchPlayerBar(
+            SearchPlayerField(
                 value = playerFilter,
                 onValueChange = onPlayerFilterChanged,
                 navigateToFilter = navigateToFilter
