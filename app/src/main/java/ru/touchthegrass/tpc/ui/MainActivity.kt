@@ -66,6 +66,12 @@ class MainActivity : ComponentActivity() {
                     onReadinessChanged = { isReady ->
                         viewModel.changeReadiness(isReady)
                     },
+                    onPieceChanged = { pieceId ->
+                        viewModel.choosePiece(pieceId)
+                    },
+                    onPositionChanged = { position ->
+                        viewModel.choosePosition(position)
+                    },
                     onConfirmTurnPressed = {
                         viewModel.movePiece()
                     }

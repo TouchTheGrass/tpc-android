@@ -45,6 +45,8 @@ fun TpcApp(
     createLobby: () -> Unit,
     onPieceColorChanged: (PieceColor) -> Unit,
     onReadinessChanged: (Boolean) -> Unit,
+    onPieceChanged: (Int?) -> Unit,
+    onPositionChanged: (String?) -> Unit,
     onConfirmTurnPressed: () -> Unit
 ) {
 
@@ -66,6 +68,8 @@ fun TpcApp(
             GameScreen(
                 tpcPlayerState = tpcPlayerState,
                 tpcLobbyState = tpcLobbyState,
+                onPieceChanged = onPieceChanged,
+                onPositionChanged = onPositionChanged,
                 onConfirmTurnPressed = onConfirmTurnPressed
             )
         } else {

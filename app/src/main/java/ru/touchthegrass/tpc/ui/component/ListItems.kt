@@ -235,7 +235,7 @@ fun SwitchListItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 16.dp,),
+            .padding(vertical = 4.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -355,33 +355,21 @@ fun PieceColorVariantItem(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            var imageResourceId: Int? = null
-            var imageDescription: String? = null
-
-            when (color) {
-                PieceColor.WHITE -> {
-                    imageResourceId = R.drawable.king_white_512
-                    imageDescription = "White pieces"
-                }
-
-                PieceColor.BLACK -> {
-                    imageResourceId = R.drawable.king_black_512
-                    imageDescription = "Black pieces"
-                }
-
-                PieceColor.RED -> {
-                    imageResourceId = R.drawable.king_red_512
-                    imageDescription = "Red pieces"
-                }
-            }
-
-            Image(
+            Icon(
                 modifier = Modifier
                     .size(80.dp)
                     .padding(bottom = 8.dp),
-                painter = painterResource(imageResourceId),
-                contentDescription = imageDescription
+                painter = painterResource(id = R.drawable.king),
+                contentDescription = color.title,
+                tint = colorResource(
+                    when (color) {
+                        PieceColor.WHITE -> R.color.white
+                        PieceColor.BLACK -> R.color.black
+                        PieceColor.RED -> R.color.crimson
+                    }
+                )
             )
+
             Text(
                 text = color.title,
                 textAlign = TextAlign.Center,
@@ -443,7 +431,7 @@ fun PositionVariantItem(
     Card(
         modifier = Modifier
             .padding(horizontal = 4.dp)
-            .clickable { onItemPressed },
+            .clickable { onItemPressed(selected) },
         shape = MaterialTheme.shapes.medium,
         border = BorderStroke(5.dp, borderColor),
         colors = CardDefaults.cardColors(

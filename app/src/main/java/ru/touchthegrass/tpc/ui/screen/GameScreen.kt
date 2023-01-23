@@ -24,6 +24,8 @@ import ru.touchthegrass.tpc.model.TpcPlayerState
 fun GameScreen(
     tpcPlayerState: TpcPlayerState,
     tpcLobbyState: TpcLobbyState,
+    onPieceChanged: (Int?) -> Unit,
+    onPositionChanged: (String?) -> Unit,
     onConfirmTurnPressed: () -> Unit
 ) {
     val cells = tpcLobbyState.cells
@@ -33,7 +35,7 @@ fun GameScreen(
     val pieceListState = rememberLazyListState()
     val positionListState = rememberLazyListState()
 
-    val whoseMove = tpcLobbyState.playerGameSessionInfos.firstOrNull() { it.status == PlayerStatus.CURRENT_TURN }
+    val whoseMove = tpcLobbyState.playerGameSessionInfos.firstOrNull { it.status == PlayerStatus.CURRENT_TURN }
     val bottomButtonText = if (whoseMove?.player?.id == tpcPlayerState.currentPlayer!!.id) {
         if (tpcLobbyState.selectedPiece == null) stringResource(R.string.select_piece)
         else if (tpcLobbyState.selectedPosition == null) stringResource(R.string.select_position)
@@ -49,7 +51,10 @@ fun GameScreen(
     ) {
         QuadrangleBoard(
             cells = cells,
-            pieces = pieces
+            pieces = pieces,
+            positions = positions,
+            selectedPiece = tpcLobbyState.selectedPiece,
+            selectedPosition = tpcLobbyState.selectedPosition,
         )
 
         LazyRow(
@@ -66,7 +71,9 @@ fun GameScreen(
                 PieceVariantItem(
                     piece = piece,
                     selected = tpcLobbyState.selectedPiece?.id == piece.id,
-                    onItemPressed = {}
+                    onItemPressed = { isSelected ->
+                        onPieceChanged(piece.id)
+                    }
                 )
             }
 
@@ -81,12 +88,15 @@ fun GameScreen(
                 horizontalArrangement = Arrangement.Center
             ) {
                 items(
-                    items = positions
+                    items = positions,
+                    key = { it }
                 ) { position ->
                     PositionVariantItem(
                         position = position,
                         selected = tpcLobbyState.selectedPosition == position,
-                        onItemPressed = {}
+                        onItemPressed = { isSelected ->
+                            onPositionChanged(if (isSelected) null else position)
+                        }
                     )
                 }
 

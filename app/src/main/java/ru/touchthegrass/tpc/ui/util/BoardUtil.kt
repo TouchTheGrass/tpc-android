@@ -35,27 +35,43 @@ private val pieceImageIdMap = mapOf(
 private val positionOffsetMap = mapOf(
     "a1" to IntOffset(258, 873),
     "a2" to IntOffset(242, 802),
+    "a3" to IntOffset(226, 731),
+    "a4" to IntOffset(226, 660),
 
     "b1" to IntOffset(336, 873),
     "b2" to IntOffset(320, 775),
+    "b3" to IntOffset(304, 677),
+    "b4" to IntOffset(304, 579),
 
     "c1" to IntOffset(412, 873),
     "c2" to IntOffset(400, 760),
+    "c3" to IntOffset(388, 647),
+    "c4" to IntOffset(388, 534),
 
     "d1" to IntOffset(486, 873),
     "d2" to IntOffset(480, 740),
+    "d3" to IntOffset(474, 607),
+    "d4" to IntOffset(474, 607),
 
     "e1" to IntOffset(554, 873),
     "e2" to IntOffset(554, 740),
+    "e3" to IntOffset(554, 627),
+    "e4" to IntOffset(554, 627),
 
     "f1" to IntOffset(622, 873),
     "f2" to IntOffset(630, 760),
+    "f3" to IntOffset(638, 647),
+    "f4" to IntOffset(638, 534),
 
     "g1" to IntOffset(696, 873),
     "g2" to IntOffset(702, 775),
+    "g3" to IntOffset(708, 677),
+    "g4" to IntOffset(708, 579),
 
     "h1" to IntOffset(770, 873),
     "h2" to IntOffset(780, 802),
+    "h3" to IntOffset(790, 731),
+    "h4" to IntOffset(790, 660),
 )
 
 fun getPieceImageId(piece: Piece): Int {

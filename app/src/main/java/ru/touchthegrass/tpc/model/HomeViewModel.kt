@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ru.touchthegrass.tpc.data.*
+import ru.touchthegrass.tpc.data.local.LocalCellsProvider
+import ru.touchthegrass.tpc.data.local.LocalPiecesProvider
 import ru.touchthegrass.tpc.manager.LobbyManager
 import ru.touchthegrass.tpc.manager.UserManager
 import ru.touchthegrass.tpc.manager.local.LocalLobbyManager
@@ -13,6 +15,7 @@ import ru.touchthegrass.tpc.repository.LobbyRepository
 import ru.touchthegrass.tpc.repository.PlayerRepository
 import ru.touchthegrass.tpc.repository.local.LocalLobbyRepository
 import ru.touchthegrass.tpc.repository.local.LocalPlayerRepository
+import ru.touchthegrass.tpc.ui.models.CellModel
 
 class TpcHomeViewModel(
     private val lobbyRepository: LobbyRepository = LocalLobbyRepository(),
@@ -213,13 +216,49 @@ class TpcHomeViewModel(
             playerId = playerState.value.currentPlayer!!.id,
             status = if (isReady) PlayerStatus.READY else PlayerStatus.NOT_READY
         )
+        val gameSession = _lobbyState.value.gameSession
+        var cells = _lobbyState.value.cells
+        var pieces = _lobbyState.value.pieces
+        if (updatedInfos.all { it.status == PlayerStatus.READY }) {
+            gameSession!!.status = GameSessionStatus.GAME
+            cells = LocalCellsProvider.allCells()
+            pieces = LocalPiecesProvider.getWhitePieces(gameSession)
+            updatedInfos.first().status = PlayerStatus.CURRENT_TURN
+        }
         _lobbyState.value = _lobbyState.value.copy(
-            playerGameSessionInfos = updatedInfos
+            playerGameSessionInfos = updatedInfos,
+            gameSession = gameSession,
+            cells = cells,
+            pieces = pieces
+        )
+
+    }
+
+    fun choosePiece(pieceId: Int?) {
+        val piece = if (pieceId == null)
+            null
+        else
+            LocalPiecesProvider.allPieces.find { piece -> piece.id == pieceId }
+
+        _lobbyState.value = _lobbyState.value.copy(
+            selectedPiece = piece
+        )
+    }
+
+    fun choosePosition(position: String?) {
+        _lobbyState.value = _lobbyState.value.copy(
+            selectedPosition = position
         )
     }
 
     fun movePiece() {
-        // TODO
+        val pieceId = _lobbyState.value.selectedPiece?.id ?: return
+        val position = _lobbyState.value.selectedPosition ?: return
+        val pieces = LocalPiecesProvider.allPieces
+        pieces.find { it.id == pieceId }?.position = position
+        _lobbyState.value = _lobbyState.value.copy(
+            pieces = pieces
+        )
     }
 }
 
@@ -245,7 +284,7 @@ data class TpcLobbyState(
     val lobbies: List<Lobby> = emptyList(),
     val gameSession: GameSession? = null,
     val playerGameSessionInfos: List<PlayerGameSession> = emptyList(),
-    val cells: List<Cell> = emptyList(),
+    val cells: List<CellModel> = emptyList(),
     val pieces: List<Piece> = emptyList(),
     val positions: List<String> = emptyList(),
     val selectedPiece: Piece? = null,
