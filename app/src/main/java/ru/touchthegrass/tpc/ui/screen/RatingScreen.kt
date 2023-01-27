@@ -15,30 +15,30 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.touchthegrass.tpc.R
 import ru.touchthegrass.tpc.data.Player
+import ru.touchthegrass.tpc.state.TpcDataState
+import ru.touchthegrass.tpc.state.TpcUIState
+import ru.touchthegrass.tpc.state.TpcUserState
 import ru.touchthegrass.tpc.ui.component.RatingPlayerListItem
 import ru.touchthegrass.tpc.ui.component.SearchPlayerField
-import ru.touchthegrass.tpc.model.TpcFilterState
-import ru.touchthegrass.tpc.model.TpcHomeUIState
-import ru.touchthegrass.tpc.model.TpcPlayerState
 
 @Composable
 fun TpcRatingScreen(
-    tpcHomeUIState: TpcHomeUIState,
-    tpcPlayerState: TpcPlayerState,
-    tpcFilterState: TpcFilterState,
+    uiState: TpcUIState,
+    userState: TpcUserState,
+    dataState: TpcDataState,
     closeFilterScreen: () -> Unit,
     navigateToFilter: () -> Unit,
     onPlayerFilterChanged: (String) -> Unit
 ) {
-    if (tpcHomeUIState.openedFilter) {
+    if (uiState.openedFilter) {
         BackHandler {
             closeFilterScreen()
         }
         TpcFilterScreen(closeFilterScreen)
     } else {
-        val players = tpcPlayerState.players
+        val players = dataState.players
             .filter { player ->
-                player.name.lowercase().contains(tpcFilterState.playerFilter.lowercase())
+                player.name.lowercase().contains(dataState.playerFilter.lowercase())
             }
             .sortedByDescending { it.rating }
 
@@ -46,7 +46,7 @@ fun TpcRatingScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             TpcRatingList(
-                playerFilter = tpcFilterState.playerFilter,
+                playerFilter = dataState.playerFilter,
                 players = players,
                 navigateToFilter = navigateToFilter,
                 onPlayerFilterChanged = onPlayerFilterChanged,

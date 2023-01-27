@@ -1,44 +1,52 @@
 package ru.touchthegrass.tpc.ui.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import ru.touchthegrass.tpc.ui.component.BottomButtonBar
-import ru.touchthegrass.tpc.ui.component.QuadrangleBoard
-import ru.touchthegrass.tpc.model.TpcLobbyState
 import ru.touchthegrass.tpc.R
 import ru.touchthegrass.tpc.data.PlayerStatus
-import ru.touchthegrass.tpc.ui.component.PieceVariantItem
-import ru.touchthegrass.tpc.ui.component.PositionVariantItem
-import ru.touchthegrass.tpc.model.TpcPlayerState
+import ru.touchthegrass.tpc.state.TpcGameState
+import ru.touchthegrass.tpc.state.TpcLobbyState
+import ru.touchthegrass.tpc.state.TpcUserState
+import ru.touchthegrass.tpc.ui.component.*
 
 @Composable
 fun GameScreen(
-    tpcPlayerState: TpcPlayerState,
-    tpcLobbyState: TpcLobbyState,
-    onConfirmTurnPressed: () -> Unit
+    userState: TpcUserState,
+    lobbyState: TpcLobbyState,
+    gameState: TpcGameState,
+    onPieceSelected: (Int?) -> Unit,
+    onPositionSelected: (String?) -> Unit,
+    onConfirmTurnPressed: (Int, String) -> Unit,
+    onConsiderPressed: () -> Unit
 ) {
-    val cells = tpcLobbyState.cells
-    val pieces = tpcLobbyState.pieces
-    val positions = tpcLobbyState.positions
+    val userColor = lobbyState.playerGameSessionInfos
+        .first { it.player.id == userState.currentPlayer!!.id }
+        .color
 
+    val openConsiderDialog = remember { mutableStateOf(false) }
     val pieceListState = rememberLazyListState()
     val positionListState = rememberLazyListState()
 
-    val whoseMove = tpcLobbyState.playerGameSessionInfos.firstOrNull() { it.status == PlayerStatus.CURRENT_TURN }
-    val bottomButtonText = if (whoseMove?.player?.id == tpcPlayerState.currentPlayer!!.id) {
-        if (tpcLobbyState.selectedPiece == null) stringResource(R.string.select_piece)
-        else if (tpcLobbyState.selectedPosition == null) stringResource(R.string.select_position)
-        else stringResource(R.string.confirm_turn)
-    } else "${whoseMove?.color!!.title} move"
+    if (openConsiderDialog.value) {
+        ConsiderDialog(
+            openDialog = openConsiderDialog,
+            onConsiderPressed = onConsiderPressed
+        )
+    }
+
+    BackHandler {
+        openConsiderDialog.value = true
+    }
 
     Column(
         modifier = Modifier
@@ -48,54 +56,79 @@ fun GameScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         QuadrangleBoard(
-            cells = cells,
-            pieces = pieces
+            modifier = Modifier
+                .weight(11f),
+            pieces = gameState.pieces,
+            positions = gameState.positions
         )
 
-        LazyRow(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp),
-            state = pieceListState,
-            horizontalArrangement = Arrangement.Center
+                .weight(6f)
+                .padding(vertical = 10.dp),
+            verticalArrangement = Arrangement.Top
         ) {
-            items(
-                items = pieces,
-                key = { it.id }
-            ) { piece ->
-                PieceVariantItem(
-                    piece = piece,
-                    selected = tpcLobbyState.selectedPiece?.id == piece.id,
-                    onItemPressed = {}
-                )
-            }
 
-        }
-
-        if (tpcLobbyState.selectedPiece != null) {
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
-                state = positionListState,
+                state = pieceListState,
                 horizontalArrangement = Arrangement.Center
             ) {
                 items(
-                    items = positions
-                ) { position ->
-                    PositionVariantItem(
-                        position = position,
-                        selected = tpcLobbyState.selectedPosition == position,
-                        onItemPressed = {}
+                    items = gameState.pieces.filter { it.info.color == userColor },
+                    key = { it.info.id }
+                ) { piece ->
+                    val pieceInfo = piece.info
+                    PieceVariantItem(
+                        piece = pieceInfo,
+                        selected = gameState.selectedPieceId == pieceInfo.id,
+                        onItemPressed = { isSelected ->
+                            onPieceSelected(if (isSelected) null else pieceInfo.id)
+                        }
                     )
                 }
 
             }
+
+            if (gameState.selectedPieceId != null) {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    state = positionListState,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    items(
+                        items = gameState.positions,
+                        key = { it.str }
+                    ) { position ->
+                        val positionStr = position.str
+                        PositionVariantItem(
+                            position = positionStr,
+                            selected = gameState.selectedPosition == positionStr,
+                            onItemPressed = { isSelected ->
+                                onPositionSelected(if (isSelected) null else positionStr)
+                            }
+                        )
+                    }
+                }
+            }
         }
 
+        val whoseMove = lobbyState.playerGameSessionInfos.firstOrNull { it.status == PlayerStatus.CURRENT_TURN }
         BottomButtonBar(
-            text = bottomButtonText,
-            onClick = onConfirmTurnPressed
+            text = if (whoseMove?.player?.id == userState.currentPlayer?.id) {
+                if (gameState.selectedPieceId == null) stringResource(R.string.select_piece)
+                else if (gameState.selectedPosition == null) stringResource(R.string.select_position)
+                else stringResource(R.string.confirm_turn)
+            } else "${whoseMove?.color?.title} move",
+            onClick = {
+                if (gameState.selectedPieceId == null) return@BottomButtonBar
+                if (gameState.selectedPosition == null) return@BottomButtonBar
+                onConfirmTurnPressed(gameState.selectedPieceId, gameState.selectedPosition)
+            }
         )
     }
 }

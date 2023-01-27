@@ -30,6 +30,7 @@ fun NavigationDrawer(
     selectedDestination: String,
     navigateToTopLevelDestination: (TpcTopLevelDestination) -> Unit,
     createLobby: () -> Unit,
+    logoutUser: () -> Unit,
     closeDrawer: () -> Unit = {}
 ) {
     ModalDrawerSheet {
@@ -127,7 +128,7 @@ fun NavigationDrawer(
                             selectedDestination = selectedDestination,
                             tpcDestination = tpcDestination,
                         ) {
-
+                            logoutUser()
                         }
                     }
                 }

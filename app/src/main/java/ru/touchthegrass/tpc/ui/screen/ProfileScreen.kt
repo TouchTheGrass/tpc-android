@@ -14,15 +14,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ru.touchthegrass.tpc.data.*
+import ru.touchthegrass.tpc.state.TpcDataState
+import ru.touchthegrass.tpc.state.TpcUserState
 import ru.touchthegrass.tpc.ui.component.ProfileHistoryListItem
 import ru.touchthegrass.tpc.ui.component.SearchPlayerField
-import ru.touchthegrass.tpc.model.TpcFilterState
-import ru.touchthegrass.tpc.model.TpcPlayerState
 
 @Composable
 fun TpcProfileScreen(
-    tpcPlayerState: TpcPlayerState,
-    tpcFilterState: TpcFilterState,
+    userState: TpcUserState,
+    dataState: TpcDataState,
     navigateToFilter: () -> Unit,
     onPlayerFilterChanged: (String) -> Unit
 ) {
@@ -38,27 +38,27 @@ fun TpcProfileScreen(
                 .padding(horizontal = 16.dp),
             state = profileHistoryLazyState
         ) {
-            val player = tpcPlayerState.currentPlayer!!
+            val player = userState.currentPlayer!!
 
             item {
                 ProfileHeader(
                     player = player,
-                    playerHistory = tpcPlayerState.currentPlayerHistory
+                    playerHistory = userState.currentPlayerHistory
                 )
             }
 
             item {
                 SearchPlayerField(
-                    value = tpcFilterState.playerFilter,
+                    value = dataState.playerFilter,
                     onValueChange = onPlayerFilterChanged,
                     navigateToFilter = navigateToFilter
                 )
             }
 
             items(
-                items = tpcPlayerState.currentPlayerHistory.filter { lobby ->
+                items = userState.currentPlayerHistory.filter { lobby ->
                     lobby.playerInfos.any { playerInfo ->
-                        playerInfo.player.name.lowercase().contains(tpcFilterState.playerFilter.lowercase())
+                        playerInfo.player.name.lowercase().contains(dataState.playerFilter.lowercase())
                     }
                 },
                 key = { it.gameSession.id }

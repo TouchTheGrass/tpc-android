@@ -1,7 +1,7 @@
 package ru.touchthegrass.tpc.data
 
 enum class PieceType {
-    KING, QUEEN, BISHOP, ROOK, KNIGHT, PAWN
+    KING, QUEEN, BISHOP, KNIGHT, ROOK, PAWN
 }
 
 enum class PieceColor(val title: String) {

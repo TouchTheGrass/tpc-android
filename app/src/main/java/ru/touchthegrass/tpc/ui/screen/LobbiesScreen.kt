@@ -19,33 +19,31 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.touchthegrass.tpc.R
 import ru.touchthegrass.tpc.data.Lobby
-import ru.touchthegrass.tpc.model.TpcHomeUIState
+import ru.touchthegrass.tpc.state.TpcDataState
 import ru.touchthegrass.tpc.ui.component.LobbyListItem
 import ru.touchthegrass.tpc.ui.component.SearchPlayerField
-import ru.touchthegrass.tpc.model.TpcFilterState
-import ru.touchthegrass.tpc.model.TpcLobbyState
+import ru.touchthegrass.tpc.state.TpcUIState
 
 @Composable
 fun TpcLobbiesScreen(
-    tpcHomeUIState: TpcHomeUIState,
-    tpcFilterState: TpcFilterState,
-    tpcLobbyState: TpcLobbyState,
+    uiState: TpcUIState,
+    dataState: TpcDataState,
     closeFilterScreen: () -> Unit,
     navigateToFilter: () -> Unit,
     onPlayerFilterChanged: (String) -> Unit,
     navigateOnLobbyScreen: (Int) -> Unit,
     createLobby: () -> Unit
 ) {
-    if (tpcHomeUIState.openedFilter) {
+    if (uiState.openedFilter) {
         BackHandler {
             closeFilterScreen()
         }
         TpcFilterScreen(closeFilterScreen)
     } else {
-        val lobbies = tpcLobbyState.lobbies
+        val lobbies = dataState.lobbies
             .filter { lobby ->
                 lobby.playerInfos.any { playerInfo ->
-                    playerInfo.player.name.lowercase().contains(tpcFilterState.playerFilter.lowercase())
+                    playerInfo.player.name.lowercase().contains(dataState.playerFilter.lowercase())
                 }
             }
 
@@ -53,7 +51,7 @@ fun TpcLobbiesScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             TpcLobbyList(
-                playerFilter = tpcFilterState.playerFilter,
+                playerFilter = dataState.playerFilter,
                 lobbies = lobbies,
                 navigateToFilter = navigateToFilter,
                 onPlayerFilterChanged = onPlayerFilterChanged,
