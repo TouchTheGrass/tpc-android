@@ -27,14 +27,8 @@
             q 2 4 -1.2 12
             l 4 4
             l -35 35
-            z
-          "
-    />
-    <path android:fillColor="#FFFFFF"
-          android:strokeWidth="1"
-          android:strokeLineCap="round"
-          android:strokeColor="#000000"
-          android:pathData="
+            Z
+
             M 78 70
             l 5 -3
             v -40
@@ -42,19 +36,13 @@
             q -2 2 0 4
             q 6 -7 15 0
             l 24 21
-            z
-            "
-    />
-    <path android:fillColor="#FFFFFF"
-          android:strokeWidth="1"
-          android:strokeLineCap="round"
-          android:strokeColor="#000000"
-          android:pathData="
+            Z
+
             M 29 99.5
             l 46 0
             l 0 -7
             l -46 0
-            z
+            Z
           "
     />
 </vector>

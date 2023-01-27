@@ -1,9 +1,6 @@
 package ru.touchthegrass.tpc.ui.component
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForwardIos
@@ -22,7 +19,6 @@ import com.google.accompanist.flowlayout.FlowRow
 import ru.touchthegrass.tpc.R
 import ru.touchthegrass.tpc.data.*
 import ru.touchthegrass.tpc.ui.navigation.TpcTopLevelDestination
-import ru.touchthegrass.tpc.ui.util.getPieceImageId
 import kotlin.math.abs
 
 enum class PieceColorStatus {
@@ -334,7 +330,7 @@ fun PieceColorVariantItem(
     status: PieceColorStatus,
     onPieceColorChanged: (PieceColor) -> Unit
 ) {
-    val borderColor = when (status) {
+    val cardColor = when (status) {
         PieceColorStatus.ENABLED -> MaterialTheme.colorScheme.primary
         PieceColorStatus.DISABLED -> MaterialTheme.colorScheme.outline
         PieceColorStatus.SELECTED -> colorResource(R.color.green0)
@@ -343,9 +339,9 @@ fun PieceColorVariantItem(
         modifier = modifier
             .clickable { onPieceColorChanged(color) },
         shape = MaterialTheme.shapes.medium,
-        border = BorderStroke(5.dp, borderColor),
+//        border = BorderStroke(5.dp, cardColor),
         colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent
+            containerColor = cardColor
         )
     ) {
         Column(
@@ -373,7 +369,8 @@ fun PieceColorVariantItem(
             Text(
                 text = color.title,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }
@@ -385,16 +382,16 @@ fun PieceVariantItem(
     selected: Boolean,
     onItemPressed: (Boolean) -> Unit = {}
 ) {
-    val borderColor = if (selected) colorResource(R.color.green0) else MaterialTheme.colorScheme.primary
+    val cardColor = if (selected) colorResource(R.color.green0) else MaterialTheme.colorScheme.primary
 
     Card(
         modifier = Modifier
             .padding(horizontal = 4.dp)
-            .clickable { onItemPressed },
+            .clickable { onItemPressed(selected) },
         shape = MaterialTheme.shapes.medium,
-        border = BorderStroke(5.dp, borderColor),
+//        border = BorderStroke(5.dp, cardColor),
         colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent
+            containerColor = cardColor
         )
     ) {
         Column(
@@ -404,17 +401,34 @@ fun PieceVariantItem(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Image(
+            Icon(
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(60.dp)
                     .padding(bottom = 8.dp),
-                painter = painterResource(getPieceImageId(piece)),
-                contentDescription = "Piece"
+                contentDescription = "${piece.color.name} ${piece.type.name}",
+                painter = painterResource(
+                    when (piece.type) {
+                        PieceType.PAWN -> R.drawable.pawn
+                        PieceType.ROOK -> R.drawable.rook
+                        PieceType.KNIGHT -> R.drawable.knight
+                        PieceType.BISHOP -> R.drawable.bishop
+                        PieceType.QUEEN -> R.drawable.queen
+                        PieceType.KING -> R.drawable.king
+                    }
+                ),
+                tint = colorResource(
+                    when (piece.color) {
+                        PieceColor.WHITE -> R.color.white
+                        PieceColor.BLACK -> R.color.black
+                        PieceColor.RED -> R.color.crimson
+                    }
+                )
             )
             Text(
                 text = piece.position.uppercase(),
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }
@@ -426,16 +440,16 @@ fun PositionVariantItem(
     selected: Boolean,
     onItemPressed: (Boolean) -> Unit = {}
 ) {
-    val borderColor = if (selected) colorResource(R.color.green0) else MaterialTheme.colorScheme.primary
+    val cardColor = if (selected) colorResource(R.color.green0) else MaterialTheme.colorScheme.primary
 
     Card(
         modifier = Modifier
             .padding(horizontal = 4.dp)
             .clickable { onItemPressed(selected) },
         shape = MaterialTheme.shapes.medium,
-        border = BorderStroke(5.dp, borderColor),
+//        border = BorderStroke(5.dp, cardColor),
         colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent
+            containerColor = cardColor
         )
     ) {
         Column(
@@ -447,10 +461,9 @@ fun PositionVariantItem(
             Text(
                 text = position.uppercase(),
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }
 }
-
-

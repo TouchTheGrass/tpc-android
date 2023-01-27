@@ -1,5 +1,6 @@
 package ru.touchthegrass.tpc.repository.local
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import ru.touchthegrass.tpc.data.Lobby
@@ -63,18 +64,19 @@ class LocalLobbyRepository : LobbyRepository {
         .toMutableList()
 
     override fun getActiveLobbies(): Flow<List<Lobby>> = flow {
-        emit(activeLobbies)
+        while (true) {
+            emit(activeLobbies)
+            delay(100)
+        }
     }
 
-    override fun getPlayerHistory(playerId: Int): Flow<List<Lobby>> = flow {
-        emit(
-            completedLobbies.filter { lobby ->
-                val playerInfo = lobby.playerInfos
-                    .find { it.player.id == playerId }
-                    ?: return@filter false
-                playerInfo.status == PlayerStatus.DONE || playerInfo.status == PlayerStatus.DISCONNECTED
-            }
-        )
+    override fun getPlayerHistory(playerId: Int): List<Lobby> {
+        return completedLobbies.filter { lobby ->
+            val playerInfo = lobby.playerInfos
+                .find { it.player.id == playerId }
+                ?: return@filter false
+            playerInfo.status == PlayerStatus.DONE || playerInfo.status == PlayerStatus.DISCONNECTED
+        }
     }
 
     override fun getLobbyByGameSessionId(gameSessionId: Int): Lobby {

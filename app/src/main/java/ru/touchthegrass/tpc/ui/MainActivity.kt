@@ -7,8 +7,8 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ru.touchthegrass.tpc.ui.model.TpcHomeViewModel
 import ru.touchthegrass.tpc.ui.theme.TpcTheme
-import ru.touchthegrass.tpc.model.TpcHomeViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -22,14 +22,16 @@ class MainActivity : ComponentActivity() {
             TpcTheme {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 val playerState by viewModel.playerState.collectAsStateWithLifecycle()
-                val filterState by viewModel.filterState.collectAsStateWithLifecycle()
+                val dataState by viewModel.dataState.collectAsStateWithLifecycle()
                 val lobbyState by viewModel.lobbyState.collectAsStateWithLifecycle()
+                val gameState by viewModel.gameState.collectAsStateWithLifecycle()
 
                 TpcApp(
-                    tpcHomeUIState = uiState,
-                    tpcPlayerState = playerState,
-                    tpcFilterState = filterState,
-                    tpcLobbyState = lobbyState,
+                    uiState = uiState,
+                    userState = playerState,
+                    dataState = dataState,
+                    lobbyState = lobbyState,
+                    gameState = gameState,
                     loginUser = { email, password ->
                         viewModel.loginUser(email, password)
                     },
@@ -55,25 +57,37 @@ class MainActivity : ComponentActivity() {
                         viewModel.closeLobbyScreen()
                     },
                     navigateOnLobbyScreen = { gameSessionId ->
-                        viewModel.setCurrentLobby(gameSessionId)
+                        viewModel.connectLobby(gameSessionId)
+                    },
+                    onRatingScreenNavigated = {
+                        viewModel.updateRatingInfo()
+                    },
+                    onProfileScreenNavigated = {
+                        viewModel.updateUserInfo()
                     },
                     createLobby = {
                         viewModel.createLobby()
                     },
+                    logoutUser = {
+                        viewModel.logoutUser()
+                    },
                     onPieceColorChanged = { pieceColor ->
-                        viewModel.setPieceColor(pieceColor)
+                        viewModel.changePieceColor(pieceColor)
                     },
                     onReadinessChanged = { isReady ->
                         viewModel.changeReadiness(isReady)
                     },
-                    onPieceChanged = { pieceId ->
-                        viewModel.choosePiece(pieceId)
+                    onPieceSelected = { pieceId ->
+                        viewModel.selectPiece(pieceId)
                     },
-                    onPositionChanged = { position ->
-                        viewModel.choosePosition(position)
+                    onPositionSelected = { position ->
+                        viewModel.selectPosition(position)
                     },
-                    onConfirmTurnPressed = {
-                        viewModel.movePiece()
+                    onConfirmTurnPressed = { pieceId, position ->
+                        viewModel.movePiece(pieceId, position)
+                    },
+                    onConsiderPressed = {
+                        viewModel.considerGame()
                     }
                 )
             }

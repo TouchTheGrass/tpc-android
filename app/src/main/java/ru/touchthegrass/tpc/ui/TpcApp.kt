@@ -16,23 +16,21 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import ru.touchthegrass.tpc.data.GameSessionStatus
 import ru.touchthegrass.tpc.data.PieceColor
+import ru.touchthegrass.tpc.state.*
 import ru.touchthegrass.tpc.ui.component.BottomNavigationBar
 import ru.touchthegrass.tpc.ui.component.LobbyDrawer
 import ru.touchthegrass.tpc.ui.component.NavigationDrawer
 import ru.touchthegrass.tpc.ui.navigation.*
 import ru.touchthegrass.tpc.ui.screen.*
 import ru.touchthegrass.tpc.ui.util.*
-import ru.touchthegrass.tpc.model.TpcFilterState
-import ru.touchthegrass.tpc.model.TpcHomeUIState
-import ru.touchthegrass.tpc.model.TpcLobbyState
-import ru.touchthegrass.tpc.model.TpcPlayerState
 
 @Composable
 fun TpcApp(
-    tpcHomeUIState: TpcHomeUIState,
-    tpcPlayerState: TpcPlayerState,
-    tpcFilterState: TpcFilterState,
-    tpcLobbyState: TpcLobbyState,
+    uiState: TpcUIState,
+    userState: TpcUserState,
+    dataState: TpcDataState,
+    lobbyState: TpcLobbyState,
+    gameState: TpcGameState,
     loginUser: (String, String) -> Unit,
     registerUser: (String, String, String) -> Unit,
     navigateToLoginScreen: () -> Unit,
@@ -42,16 +40,20 @@ fun TpcApp(
     onPlayerFilterChanged: (String) -> Unit,
     closeLobbyScreen: () -> Unit,
     navigateOnLobbyScreen: (Int) -> Unit,
+    onRatingScreenNavigated: () -> Unit,
+    onProfileScreenNavigated: () -> Unit,
     createLobby: () -> Unit,
+    logoutUser: () -> Unit,
     onPieceColorChanged: (PieceColor) -> Unit,
     onReadinessChanged: (Boolean) -> Unit,
-    onPieceChanged: (Int?) -> Unit,
-    onPositionChanged: (String?) -> Unit,
-    onConfirmTurnPressed: () -> Unit
+    onPieceSelected: (Int?) -> Unit,
+    onPositionSelected: (String?) -> Unit,
+    onConfirmTurnPressed: (Int, String) -> Unit,
+    onConsiderPressed: () -> Unit
 ) {
 
-    if (tpcPlayerState.currentPlayer == null) {
-        if (tpcHomeUIState.openedRegister) {
+    if (userState.currentPlayer == null) {
+        if (uiState.openedRegister) {
             RegisterScreen(
                 onLoginPressed = navigateToLoginScreen,
                 onRegisterPressed = registerUser
@@ -62,20 +64,22 @@ fun TpcApp(
                 onRegisterPressed = navigateToRegistrationScreen
             )
         }
-    } else if (tpcHomeUIState.openedLobby) {
+    } else if (uiState.openedLobby) {
 
-        if (tpcLobbyState.gameSession!!.status == GameSessionStatus.GAME) {
+        if (lobbyState.gameSession!!.status == GameSessionStatus.GAME) {
             GameScreen(
-                tpcPlayerState = tpcPlayerState,
-                tpcLobbyState = tpcLobbyState,
-                onPieceChanged = onPieceChanged,
-                onPositionChanged = onPositionChanged,
-                onConfirmTurnPressed = onConfirmTurnPressed
+                userState = userState,
+                lobbyState = lobbyState,
+                gameState = gameState,
+                onPieceSelected = onPieceSelected,
+                onPositionSelected = onPositionSelected,
+                onConfirmTurnPressed = onConfirmTurnPressed,
+                onConsiderPressed = onConsiderPressed
             )
         } else {
             TpcLobbyWrapper(
-                tpcPlayerState = tpcPlayerState,
-                tpcLobbyState = tpcLobbyState,
+                tpcUserState = userState,
+                tpcLobbyState = lobbyState,
                 closeLobbyScreen = closeLobbyScreen,
                 onPieceColorChanged = onPieceColorChanged,
                 onReadinessChanged = onReadinessChanged
@@ -83,15 +87,17 @@ fun TpcApp(
         }
     } else {
         TpcNavigationWrapper(
-            tpcHomeUIState = tpcHomeUIState,
-            tpcPlayerState = tpcPlayerState,
-            tpcFilterState = tpcFilterState,
-            tpcLobbyState = tpcLobbyState,
+            uiState = uiState,
+            userState = userState,
+            dataState = dataState,
             closeFilterScreen = closeFilterScreen,
             navigateToFilterScreen = navigateToFilterScreen,
             onPlayerFilterChanged = onPlayerFilterChanged,
             navigateOnLobbyScreen = navigateOnLobbyScreen,
-            createLobby = createLobby
+            onRatingScreenNavigated = onRatingScreenNavigated,
+            onProfileScreenNavigated = onProfileScreenNavigated,
+            createLobby = createLobby,
+            logoutUser = logoutUser
         )
     }
 }
@@ -99,7 +105,7 @@ fun TpcApp(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TpcLobbyWrapper(
-    tpcPlayerState: TpcPlayerState,
+    tpcUserState: TpcUserState,
     tpcLobbyState: TpcLobbyState,
     closeLobbyScreen: () -> Unit,
     onPieceColorChanged: (PieceColor) -> Unit,
@@ -122,7 +128,7 @@ fun TpcLobbyWrapper(
         }
     ) {
         TpcLobbyContent(
-            tpcPlayerState = tpcPlayerState,
+            tpcUserState = tpcUserState,
             tpcLobbyState = tpcLobbyState,
             closeLobbyScreen = closeLobbyScreen,
             onPieceColorChanged = onPieceColorChanged,
@@ -137,7 +143,7 @@ fun TpcLobbyWrapper(
 
 @Composable
 fun TpcLobbyContent(
-    tpcPlayerState: TpcPlayerState,
+    tpcUserState: TpcUserState,
     tpcLobbyState: TpcLobbyState,
     closeLobbyScreen: () -> Unit,
     onPieceColorChanged: (PieceColor) -> Unit,
@@ -150,7 +156,7 @@ fun TpcLobbyContent(
             .background(MaterialTheme.colorScheme.inverseOnSurface)
     ) {
         TpcLobbyScreen(
-            currentPlayer = tpcPlayerState.currentPlayer!!,
+            currentPlayer = tpcUserState.currentPlayer!!,
             playerGameSessionInfos = tpcLobbyState.playerGameSessionInfos,
             closeLobbyScreen = closeLobbyScreen,
             onPieceColorChanged = onPieceColorChanged,
@@ -163,15 +169,17 @@ fun TpcLobbyContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TpcNavigationWrapper(
-    tpcHomeUIState: TpcHomeUIState,
-    tpcPlayerState: TpcPlayerState,
-    tpcFilterState: TpcFilterState,
-    tpcLobbyState: TpcLobbyState,
+    uiState: TpcUIState,
+    userState: TpcUserState,
+    dataState: TpcDataState,
     closeFilterScreen: () -> Unit,
     navigateToFilterScreen: () -> Unit,
     onPlayerFilterChanged: (String) -> Unit,
     navigateOnLobbyScreen: (Int) -> Unit,
-    createLobby: () -> Unit
+    onRatingScreenNavigated: () -> Unit,
+    onProfileScreenNavigated: () -> Unit,
+    createLobby: () -> Unit,
+    logoutUser: () -> Unit,
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -189,6 +197,7 @@ fun TpcNavigationWrapper(
                 selectedDestination = selectedDestination,
                 navigateToTopLevelDestination = navigationActions::navigateTo,
                 createLobby = createLobby,
+                logoutUser = logoutUser,
                 closeDrawer = {
                     scope.launch {
                         drawerState.close()
@@ -199,10 +208,9 @@ fun TpcNavigationWrapper(
         drawerState = drawerState
     ) {
         TpcTabContent(
-            tpcHomeUIState = tpcHomeUIState,
-            tpcPlayerState = tpcPlayerState,
-            tpcFilterState = tpcFilterState,
-            tpcLobbyState = tpcLobbyState,
+            uiState = uiState,
+            userState = userState,
+            dataState = dataState,
             navController = navController,
             selectedDestination = selectedDestination,
             navigateToTopLevelDestination = navigationActions::navigateTo,
@@ -210,6 +218,8 @@ fun TpcNavigationWrapper(
             navigateToFilter = navigateToFilterScreen,
             onPlayerFilterChanged = onPlayerFilterChanged,
             navigateOnLobbyScreen = navigateOnLobbyScreen,
+            onRatingScreenNavigated = onRatingScreenNavigated,
+            onProfileScreenNavigated = onProfileScreenNavigated,
             createLobby = createLobby
         )
     }
@@ -217,10 +227,9 @@ fun TpcNavigationWrapper(
 
 @Composable
 fun TpcTabContent(
-    tpcHomeUIState: TpcHomeUIState,
-    tpcPlayerState: TpcPlayerState,
-    tpcFilterState: TpcFilterState,
-    tpcLobbyState: TpcLobbyState,
+    uiState: TpcUIState,
+    userState: TpcUserState,
+    dataState: TpcDataState,
     navController: NavHostController,
     selectedDestination: String,
     navigateToTopLevelDestination: (TpcTopLevelDestination) -> Unit,
@@ -228,6 +237,8 @@ fun TpcTabContent(
     navigateToFilter: () -> Unit,
     onPlayerFilterChanged: (String) -> Unit,
     navigateOnLobbyScreen: (Int) -> Unit,
+    onRatingScreenNavigated: () -> Unit,
+    onProfileScreenNavigated: () -> Unit,
     createLobby: () -> Unit
 ) {
     Column(
@@ -236,20 +247,21 @@ fun TpcTabContent(
             .background(MaterialTheme.colorScheme.inverseOnSurface)
     ) {
 
-        val navBarEnabled = !tpcHomeUIState.openedFilter
+        val navBarEnabled = !uiState.openedFilter
 
         TpcNavHost(
             modifier = Modifier.weight(1f),
             navController = navController,
-            tpcHomeUIState = tpcHomeUIState,
-            tpcPlayerState = tpcPlayerState,
-            tpcFilterState = tpcFilterState,
-            tpcLobbyState = tpcLobbyState,
+            uiState = uiState,
+            userState = userState,
+            dataState = dataState,
             closeFilterScreen = closeFilterScreen,
             navigateToFilter = navigateToFilter,
             onPlayerFilterChanged = onPlayerFilterChanged,
             navigateOnLobbyScreen = navigateOnLobbyScreen,
-            createLobby = createLobby
+            createLobby = createLobby,
+            onRatingScreenNavigated = onRatingScreenNavigated,
+            onProfileScreenNavigated = onProfileScreenNavigated
         )
         if (navBarEnabled) {
             BottomNavigationBar(
@@ -264,15 +276,16 @@ fun TpcTabContent(
 private fun TpcNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    tpcHomeUIState: TpcHomeUIState,
-    tpcPlayerState: TpcPlayerState,
-    tpcFilterState: TpcFilterState,
-    tpcLobbyState: TpcLobbyState,
+    uiState: TpcUIState,
+    userState: TpcUserState,
+    dataState: TpcDataState,
     closeFilterScreen: () -> Unit,
     navigateToFilter: () -> Unit,
     onPlayerFilterChanged: (String) -> Unit,
     navigateOnLobbyScreen: (Int) -> Unit,
-    createLobby: () -> Unit
+    createLobby: () -> Unit,
+    onRatingScreenNavigated: () -> Unit,
+    onProfileScreenNavigated: () -> Unit
 ) {
     NavHost(
         modifier = modifier,
@@ -281,9 +294,8 @@ private fun TpcNavHost(
     ) {
         composable(TpcRoute.LOBBIES) {
             TpcLobbiesScreen(
-                tpcHomeUIState = tpcHomeUIState,
-                tpcFilterState = tpcFilterState,
-                tpcLobbyState = tpcLobbyState,
+                uiState = uiState,
+                dataState = dataState,
                 closeFilterScreen = closeFilterScreen,
                 navigateToFilter = navigateToFilter,
                 onPlayerFilterChanged = onPlayerFilterChanged,
@@ -292,19 +304,21 @@ private fun TpcNavHost(
             )
         }
         composable(TpcRoute.RATING) {
+            onRatingScreenNavigated()
             TpcRatingScreen(
-                tpcHomeUIState = tpcHomeUIState,
-                tpcPlayerState = tpcPlayerState,
-                tpcFilterState = tpcFilterState,
+                uiState = uiState,
+                userState = userState,
+                dataState = dataState,
                 closeFilterScreen = closeFilterScreen,
                 navigateToFilter = navigateToFilter,
                 onPlayerFilterChanged = onPlayerFilterChanged
             )
         }
         composable(TpcRoute.PROFILE) {
+            onProfileScreenNavigated()
             TpcProfileScreen(
-                tpcPlayerState = tpcPlayerState,
-                tpcFilterState = tpcFilterState,
+                userState = userState,
+                dataState = dataState,
                 navigateToFilter = navigateToFilter,
                 onPlayerFilterChanged = onPlayerFilterChanged,
             )

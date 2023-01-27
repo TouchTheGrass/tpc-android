@@ -1,15 +1,13 @@
 package ru.touchthegrass.tpc.repository.local
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import ru.touchthegrass.tpc.data.Player
 import ru.touchthegrass.tpc.data.local.LocalPlayerProvider
 import ru.touchthegrass.tpc.repository.PlayerRepository
 
 class LocalPlayerRepository : PlayerRepository {
 
-    override fun getAllPlayers(): Flow<List<Player>> = flow {
-        emit(LocalPlayerProvider.allPlayers)
+    override fun getAllPlayers(): List<Player> {
+        return LocalPlayerProvider.allPlayers
     }
 
     override fun getPlayerById(id: Int): Player {

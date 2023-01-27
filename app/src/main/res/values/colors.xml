@@ -16,4 +16,6 @@
     <color name="green0">#FF24D88F</color>
     <color name="green1">#FF00C8BE</color>
     <color name="blue0">#FF592BD6</color>
+    <color name="yellow">#ECD06E</color>
+    <color name="orange">#CA6B18</color>
 </resources>

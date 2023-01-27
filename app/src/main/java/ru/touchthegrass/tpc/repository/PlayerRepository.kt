@@ -1,11 +1,10 @@
 package ru.touchthegrass.tpc.repository
 
-import kotlinx.coroutines.flow.Flow
 import ru.touchthegrass.tpc.data.Player
 
 interface PlayerRepository {
 
-    fun getAllPlayers(): Flow<List<Player>>
+    fun getAllPlayers(): List<Player>
 
     fun getPlayerById(id: Int): Player
 
